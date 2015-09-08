@@ -20,7 +20,7 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 2. Run ant using build.xml target "eclipse-mysql" to create config files and download third-party libraries  
 3. Fill it out build.properties with your specific parameters   
 	
-**Deploy to Tomcat**
+**Deploy to Tomcat**  
 1. Run ant using build.xml target "deploy" to compile and package as a WAR file  
 2. Make sure tomcat has permission to read/write to the output directory  
 3. Upload .war file located in dist/ to Tomcat.   
