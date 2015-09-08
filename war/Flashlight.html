@@ -1,0 +1,126 @@
+<!-------------------------------------------------------------------------------
+# Copyright 2012 The University of North Carolina at Chapel Hill.
+#  All Rights Reserved.
+# 
+#  Permission to use, copy, modify OR distribute this software and its
+#  documentation for educational, research and non-profit purposes, without
+#  fee, and without a written agreement is hereby granted, provided that the
+#  above copyright notice and the following three paragraphs appear in all
+#  copies.
+# 
+#  IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+#  LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+#  CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+#  USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+#  OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+#  DAMAGES.
+# 
+#  THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+#  PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+#  NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+#  UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+# 
+#  The authors may be contacted via:
+# 
+#  US Mail:           Dennis Goldfarb
+#                     Wei Wang
+# 
+#                     Department of Computer Science
+#                       Sitterson Hall, CB #3175
+#                       University of N. Carolina
+#                       Chapel Hill, NC 27599-3175
+# 
+#                     Ben Major
+# 
+#                     Department of Cell Biology and Physiology 
+#                       Lineberger Comprehensive Cancer Center
+#                       University of N. Carolina
+#                       Chapel Hill, NC 27599-3175
+# 
+#  Email:             dennisg@cs.unc.edu
+#                     weiwang@cs.unc.edu
+#                     ben_major@med.unc.edu
+# 
+#  Web:               www.unc.edu/~dennisg/
+#------------------------------------------------------------------------------->
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the    -->
+<!-- browser's rendering engine into               -->
+<!-- "Standards Mode". Replacing this declaration  -->
+<!-- with a "Quirks Mode" doctype may lead to some -->
+<!-- differences in layout.                        -->
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+    <link type="text/css" rel="stylesheet" href="Flashlight.css">
+    <link rel="shortcut icon" href="images/favicon.ico">
+
+    <!--                                           -->
+    <!-- Any title is fine                         -->
+    <!--                                           -->
+    <title>Spotlite</title>
+    
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+    <script type="text/javascript" language="javascript" src="flashlight/flashlight.nocache.js"></script>
+    <script src="js/jit.js" type="text/javascript"></script>
+    <script src="js/jit-yc.js" type="text/javascript"></script>
+    <script src="js/d3.v3.min.js" type="text/javascript"></script>
+    <script src="js/Extras/excanvas.js" type="text/javascript"></script>
+    <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </head>
+
+  <!--                                           -->
+  <!-- The body can have arbitrary html, or      -->
+  <!-- you can leave the body empty if you want  -->
+  <!-- to create a completely dynamic UI.        -->
+  <!--                                           -->
+  <body>
+
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+    
+    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
+    <noscript>
+      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
+        Your web browser must have JavaScript enabled
+        in order for this application to display correctly.
+      </div>
+      
+    </noscript>
+    <div class="wrapper">
+		<div id="menu"></div>	
+	    <div id="content" align="center"></div>
+	    <div class="push"></div>
+    </div>
+    <div class="footer">
+    	<a id="UNC_logo" href="http://www.unc.edu" target="_blank"></a>
+    	<a id="LCCC_logo" href="http://www.unclineberger.org/" target="_blank"></a>
+    	<a id="CS_logo" href="http://www.cs.unc.edu" target="_blank"></a>
+    	<a id="Cell_logo" href="http://www.med.unc.edu/cellbio/" target="_blank"></a>
+    	<span id="CP">Copyright &copy; 2014 The University of North Carolina at Chapel Hill. All Rights Reserved.</span>
+    </div>
+    
+    <script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-34593564-2']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+  </body>
+</html>

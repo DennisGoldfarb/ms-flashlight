@@ -1,0 +1,229 @@
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+				xmlns:g="urn:import:com.google.gwt.user.client.ui"
+				xmlns:u="urn:import:gwtupload.client"
+				xmlns:f="urn:import:edu.unc.flashlight.client.ui.widget">
+				
+<ui:with field='cons' type='edu.unc.flashlight.client.FlashlightConstants'/>
+	<ui:style>
+		@external .gwt-TextBox;
+		
+		.progressPanel {
+			margin-top:5px;
+		}
+		.algorithmLabel {
+			font-weight:bold;
+			display:block;
+		}
+		.SAINTpanel {
+			margin-top:10px;
+		}
+		.SAINTparamsCenter {
+			width:100%
+		}
+		.header {
+			width:33%;
+		}
+		.block {
+			display:block;
+		}
+
+		.SAINTpanel .gwt-TextBox {
+			width:50px; 
+		}
+		#resultTable {
+			border: 3px solid #CCCCCC;
+			background: #EEE;
+			padding: 5px;
+			width: 350px;
+			-moz-border-radius: 15px;
+			border-radius: 15px;	
+			margin-bottom: 10px;
+		}
+		#resultTable th {
+			border-bottom: 1px solid black
+		}
+		#resultTable td {
+			padding-left: 10px;
+			padding-right: 10px;
+		}
+		#success {
+			color: green;
+			font-size: 14px;
+		}
+		#fail {
+			color: red;
+			font-size: 14px;
+		}
+		.progress {
+			margin: 1px;
+		}
+		.uploadButton {
+			margin-top:10px;
+		}
+		.bold {
+			font-weight:bold;
+		}
+		.SAINTmessage {
+			font-weight:bold;
+			display:block;
+		}
+		.borderBottom {
+			border-bottom:solid 1px;
+		}
+	</ui:style>
+				
+	<g:HTMLPanel>
+		<div id="uploadPanel"> 
+			<g:HTMLPanel>
+				<g:HTMLPanel ui:field="uploadFieldPanel" > 
+					<g:Label addStyleNames="{style.bold}"><ui:text from='{cons.uploadView_selectAPMSAlgorithm}'/></g:Label>
+					<g:RadioButton ui:field="HGSCore" ui:name="classificationAlgorithmType" checked="true"><ui:text from='{cons.hgscore}'/></g:RadioButton>
+					<g:RadioButton ui:field="CompPASS" ui:name="classificationAlgorithmType"><ui:text from='{cons.comppass}'/></g:RadioButton>
+					<g:RadioButton ui:field="SAINT" ui:name="classificationAlgorithmType"><ui:text from='{cons.saint}'/></g:RadioButton>
+					<g:HTMLPanel ui:field="SAINTexplanationPanel" addStyleNames="{style.SAINTpanel}" visible="false">	
+						<div class="{style.SAINTparamsCenter}">
+							<span class="{style.bold} {style.borderBottom}"><ui:text from='{cons.uploadView_saintParams}'/></span>
+							<table>
+								<tbody>
+									<tr>
+										<td><ui:text from='{cons.uploadView_saintVirtualControls}'/></td>
+										<td><g:TextBox ui:field="SAINTvirtualControls"></g:TextBox></td>
+									</tr>
+									<tr>
+										<td><ui:text from='{cons.uploadView_saintNumReplicates}'/></td>
+										<td><g:TextBox ui:field="SAINTnumReplicates"></g:TextBox></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</g:HTMLPanel>
+					
+					<div class="{style.SAINTpanel}">
+						<g:Label addStyleNames="{style.bold}"><ui:text from='{cons.uploadView_chooseRFParams}'/></g:Label>
+						<g:CheckBox ui:field="useRandomForest" addStyleNames="{style.block}" checked="true"><ui:text from='{cons.uploadView_useRandomForest}'/></g:CheckBox>
+					</div>
+					
+					 
+					<div class="{style.SAINTpanel}">
+					<!-- 
+						<g:Label addStyleNames="{style.bold}"><ui:text from='{cons.uploadView_selectAPMSDatasets}'/></g:Label>
+						<f:UserTable addStyleNames="userTable" ui:field="userTable"/>
+					-->
+						<f:SingleUploadWidget ui:field="uploadField" addStyleNames="{style.uploadButton}" type='BUTTON'/>
+					</div>
+					
+				</g:HTMLPanel>
+				<g:HTMLPanel ui:field="progressPanel" addStyleNames="{style.progressPanel}">
+					<f:ProgressBar ui:field="progressUpload" addStyleNames="{style.progress}" title='{cons.uploadView_uploading}' visible="false">
+					</f:ProgressBar>
+					<f:ProgressBar ui:field="progressParse" addStyleNames="{style.progress}" title='{cons.uploadView_parsing}' visible="false">
+					</f:ProgressBar>
+					<f:ProgressBar ui:field="progressMap" addStyleNames="{style.progress}" title='{cons.uploadView_mapping}' visible="false">
+					</f:ProgressBar>
+					<f:ProgressBar ui:field="progressMSScore" addStyleNames="{style.progress}" title='{cons.uploadView_MS_scoring}' visible="false">
+					</f:ProgressBar>
+					<f:ProgressBar ui:field="progressClassifier" addStyleNames="{style.progress}" title='{cons.uploadView_classifying}' visible="false">
+					</f:ProgressBar>
+					<f:ProgressBar ui:field="progressUpdate" addStyleNames="{style.progress}" title='{cons.uploadView_updating}' visible="false">
+					</f:ProgressBar>
+				</g:HTMLPanel>
+				
+				<g:HTMLPanel ui:field="errorPanel" visible="false">
+					<p id="fail"><ui:text from='{cons.uploadView_uploadFail}'/></p>
+					<f:UploadErrorTable ui:field="errorTable"/>
+				</g:HTMLPanel>
+				
+				<g:HTMLPanel ui:field="resultPanel" visible="false">
+					<p id="success"><ui:text from='{cons.uploadView_uploadSuccess}'/></p>
+					<div id="resultTable">
+					<table>
+						<tbody>
+							<tr>
+								<th colspan="4"><ui:text from='{cons.uploadCol_results}'/></th>
+							</tr>
+							<tr>
+								<th colspan="2"><ui:text from='{cons.uploadCol_mapped}'/></th>
+								<th colspan="2"><ui:text from='{cons.uploadCol_notMapped}'/></th>
+							</tr>
+							<tr>
+								<td><ui:text from='{cons.uploadCol_baits}'/></td> <td><g:Label ui:field="mappedBaits"/></td> 
+								<td><ui:text from='{cons.uploadCol_baits}'/></td> <td><g:Label ui:field="notMappedBaits"/></td>
+							</tr>
+							<tr>
+								<td><ui:text from='{cons.uploadCol_prey}'/></td> <td><g:Label ui:field="mappedPreys"/></td> 
+								<td><ui:text from='{cons.uploadCol_prey}'/></td> <td><g:Label ui:field="notMappedPreys"/></td>
+							</tr>
+							<tr>
+								<td><ui:text from='{cons.uploadCol_experiments}'/></td> <td><g:Label ui:field="mappedExperiments"/></td>
+								<td><ui:text from='{cons.uploadCol_experiments}'/></td> <td><g:Label ui:field="notMappedExperiments"/></td>
+							</tr>
+							<tr>
+								<td><ui:text from='{cons.uploadCol_interactions}'/></td> <td><g:Label ui:field="mappedInteractions"/></td> 
+								<td><ui:text from='{cons.uploadCol_interactions}'/></td> <td><g:Label ui:field="notMappedInteractions"/></td>
+							</tr>
+							<tr>
+								<td><ui:text from='{cons.uploadCol_uniqueInteractions}'/>s</td> <td><g:Label ui:field="mappedUniqueInteractions"/></td> 
+								<td><ui:text from='{cons.uploadCol_uniqueInteractions}'/></td> <td><g:Label ui:field="notMappedUniqueInteractions"/></td>
+							</tr>
+							<tr>
+								<td><ui:text from='{cons.uploadCol_controls}'/></td> <td><g:Label ui:field="mappedControls"/></td>
+							</tr>
+						</tbody>
+					</table>
+					</div>
+					<g:Button ui:field="viewDataButton" addStyleNames="blue"><ui:text from='{cons.uploadView_viewData}'/></g:Button>
+					<g:Button ui:field="downloadNotMappedButton" addStyleNames="blue"><ui:text from='{cons.uploadView_unmappedData}'/></g:Button>
+				</g:HTMLPanel>
+			</g:HTMLPanel>		
+		</div>
+	</g:HTMLPanel>
+
+</ui:UiBinder>

@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="edu.unc.flashlight.shared.model.ExperimentData" table="experiment_data">
+        <id name="id">
+            <column name="experiment_data_id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="experiment" class="edu.unc.flashlight.shared.model.Experiment" column="experiment_id"/>
+        <many-to-one name="prey" class="edu.unc.flashlight.shared.model.Gene" column="prey_gene_id"/>
+        <many-to-one name="genePair" class="edu.unc.flashlight.shared.model.GenePair" column="gene_pair_hash"/>
+        <property name="spectralCount" column="spectral_count"/>
+        <property name="preyUploadId" column="prey_upload_id"/>
+    </class>
+    
+<query name="ExperimentData.all">
+	from ExperimentData ed
+</query>
+
+<query name="ExperimentData.deleteByOldUsers">
+	delete from ExperimentData ed
+	where ed.experiment.id in (select e.id from Experiment e where e.id in (select u.id from User u where :now >= u.createdTime and u.userType.id = 1))
+</query>
+
+
+<query name="ExperimentData.deleteByUser">
+	delete from ExperimentData ed
+	where ed.experiment.id in (select e.id from Experiment e where e.user.id = :id)
+</query> 
+
+<sql-query name="ExperimentData.getHashes">
+	<return-scalar column="ed.gene_pair_hash" type="string"/>
+	<return-scalar column="bait_upload_id" type="string"/>
+	<return-scalar column="prey_upload_id" type="string"/>
+	<return-scalar column="bait_gene_id" type="long"/>
+	<return-scalar column="prey_gene_id" type="long"/>
+	select ed.gene_pair_hash, group_concat(distinct e.bait_upload_id order by e.bait_upload_id SEPARATOR '\\|') as bait_upload_id, group_concat(distinct ed.prey_upload_id order by e.bait_upload_id SEPARATOR '\\|') as prey_upload_id, max(e.bait_gene_id) as bait_gene_id, min(ed.prey_gene_id) as prey_gene_id
+	from experiment_data ed
+	inner join experiments e on e.experiment_id = ed.experiment_id
+	where e.user_id = :id and e.bait_gene_id != ed.prey_gene_id
+	and e.experiment_type_id = :exp_type
+	and ed.gene_pair_hash is not null
+	group by ed.gene_pair_hash
+	order by ed.gene_pair_hash
+</sql-query>
+
+<sql-query name="ExperimentData.getUnmapped">
+	<return-scalar column="e.bait_upload_id" type="string"/>
+	<return-scalar column="ed.prey_upload_id" type="string"/>
+	<return-scalar column="e.bait_gene_id" type="long"/>
+	<return-scalar column="ed.prey_gene_id" type="long"/>
+	select distinct e.bait_upload_id, ed.prey_upload_id, e.bait_gene_id, ed.prey_gene_id
+	from experiment_data ed
+	inner join experiments e on e.experiment_id = ed.experiment_id
+	where e.user_id = :id and e.bait_upload_id != ed.prey_upload_id
+	and (e.bait_gene_id != ed.prey_gene_id or (e.bait_gene_id is null and ed.prey_gene_id is null))
+	and e.experiment_type_id = :exp_type
+	and ed.gene_pair_hash is null
+	order by e.bait_upload_id, ed.prey_upload_id
+</sql-query>
+
+<sql-query name="getNumInteractions">
+	<return-scalar column="count" type="integer"/>
+	<![CDATA[
+	select count(1) as count
+	from experiment_data ed
+	inner join experiments e on e.experiment_id = ed.experiment_id 
+	where e.user_id in (:selected_ids)
+	]]>
+</sql-query>
+
+<sql-query name="getExp2Prey2SC">
+	<return-scalar column="ed.experiment_id" type="long"/>
+    <return-scalar column="ed.prey_gene_id" type="long"/>
+    <return-scalar column="sc" type="integer"/>
+    <return-scalar column="ed.prey_upload_id" type="string"/><![CDATA[
+	select ed.experiment_id, ed.prey_gene_id, sum(ed.spectral_count) as sc, ed.prey_upload_id
+	from experiment_data ed
+	inner join experiments e on e.experiment_id = ed.experiment_id 
+	where e.user_id in (:selected_ids)
+	and e.experiment_type_id = :exp_type
+	group by ed.experiment_id, ed.prey_gene_id
+	]]>
+</sql-query>
+
+</hibernate-mapping>

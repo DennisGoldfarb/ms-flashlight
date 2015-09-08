@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="edu.unc.flashlight.shared.model.Gene" table="genes">
+        <id name="id">
+            <column name="entrez_gene_id" />
+            <generator class="identity" />
+        </id>
+        <property name="officialSymbol" column="official_symbol"/>
+        <property name="description"/>
+        <property name="chromosome"/>
+        <property name="isObsolete"	column="is_obsolete"/>
+        <many-to-one name="geneType" class="edu.unc.flashlight.shared.model.GeneType" column="gene_type_id"/>
+        <many-to-one name="taxonomy" class="edu.unc.flashlight.shared.model.Taxonomy" column="tax_id"/>
+        
+        <set name="sequenceIds" table="gene_sequences">
+	        <key column="gene_id"/>
+	        <element column="sequence_id" type="string"/>
+    	</set>
+        
+        <set name="sequences" table="gene_sequences">
+	        <key column="gene_id"/>
+	        <many-to-many column="sequence_id"
+	            class="edu.unc.flashlight.shared.model.Sequence"/>
+    	</set>
+    	<set name="aliases" table="gene_aliases" sort="natural">
+	    	<key column="gene_id"/>
+	    	<element column="name" type="string"/> 
+		</set>
+		
+		<set name="interactions" table="gene_interactions">
+			<key column="gene_id_a"/>
+	        <one-to-many class="edu.unc.flashlight.shared.model.GeneInteraction"/>
+    	</set>
+		
+    	<bag name="annotations" table="gene_annotations" lazy="true">
+	        <key column="gene_id"/>
+	        <composite-element class="edu.unc.flashlight.shared.model.GeneAnnotation">
+	        	 <property name="pubmed" column="pubmed_id"/>
+	        	 <many-to-one name="ontologyTerm" column="ontology_term_id" class="edu.unc.flashlight.shared.model.OntologyTerm"/>
+	        	 <many-to-one name="ontologyQualifier" column="ontology_qualifier_id" class="edu.unc.flashlight.shared.model.OntologyQualifier"/>
+	        </composite-element>
+	       
+	    </bag>
+    </class>
+    
+<query name="Gene.all">
+	from Gene g
+</query> 
+
+<query name="Gene.byGeneID.Annotations">
+	from Gene g
+	left join fetch g.annotations
+	where g.id = :gene_id
+</query>
+
+<query name="Gene.byId.Filled">
+	from Gene g
+	left join fetch g.geneType as gt
+	left join fetch g.taxonomy as t
+	left join fetch g.sequenceIds as s
+	left join fetch g.aliases as a
+	where g.id = :id
+</query>
+
+<sql-query name="GeneID.bySequenceID">
+    <return-scalar column="sequence_id" type="string"/>
+    <return-scalar column="entrez_gene_id" type="long"/>
+	select s.sequence_id as sequence_id, g.entrez_gene_id as entrez_gene_id
+	from genes g
+	inner join gene_sequences s on g.entrez_gene_id = s.gene_id
+	inner join id_temp t on t.id = s.sequence_id
+</sql-query>
+
+<sql-query name="GeneID.byAlias">
+	<return-scalar column="a.name" type="string"/>
+    <return-scalar column="g.entrez_gene_id" type="long"/>
+    select a.name, g.entrez_gene_id from genes g inner join gene_aliases a on g.entrez_gene_id = a.gene_id
+    inner join id_temp t on t.id = a.name and g.tax_id = :tax_id
+    where g.is_obsolete = 0
+</sql-query>
+
+<sql-query name="GeneID.byOfficialSymbol">
+	<return-scalar column="official_symbol" type="string"/>
+    <return-scalar column="entrez_gene_id" type="long"/>
+    select official_symbol, entrez_gene_id from genes inner join id_temp t on t.id = official_symbol and tax_id = :tax_id
+    where is_obsolete = 0
+</sql-query>
+
+<sql-query name="GeneID.byGeneID">
+    <return-scalar column="entrez_gene_id" type="long"/>
+    select entrez_gene_id from genes inner join id_temp t on t.id = entrez_gene_id
+</sql-query>
+
+<sql-query name="getLengthsByUser">
+    <return-scalar column="g.entrez_gene_id" type="long"/>
+    <return-scalar column="gene_length" type="int"/><![CDATA[
+	select g.entrez_gene_id, length(s.sequence) as gene_length
+	from genes g
+	inner join gene_sequences gs on gs.gene_id = g.entrez_gene_id
+	inner join sequences s on s.sequence_id = gs.sequence_id
+	inner join (select distinct ed.prey_gene_id 
+	            from experiment_data ed
+	            inner join experiments e on e.experiment_id = ed.experiment_id
+	            where (e.experiment_role_id <= 2 or e.user_id = :id)) as myTmp on myTmp.prey_gene_id = g.entrez_gene_id
+	where s.sequence_ref_type_id = 1
+	group by g.entrez_gene_id
+	]]>
+</sql-query>
+
+<sql-query name="GeneSymbol.bySymbolQuery">
+	<return-scalar column="a" type="string"/>
+	(select distinct g1.official_symbol as a
+	from user_results ur
+	inner join genes g1 on g1.entrez_gene_id = ur.bait_gene_id
+	where g1.official_symbol like :query
+	and ur.user_id = :uid)
+	union
+	(select g1.official_symbol as a
+	from user_results ur
+	inner join genes g1 on g1.entrez_gene_id = ur.prey_gene_id
+	where g1.official_symbol like :query
+	and ur.user_id = :uid)
+	<!--union
+	(select ga.name as a
+	from user_results ur
+	inner join gene_aliases ga on ga.gene_id = ur.prey_gene_id
+	where ga.name like :query
+	and ur.user_id = :uid)
+	union
+	(select ga.name as a
+	from user_results ur
+	inner join gene_aliases ga on ga.gene_id = ur.bait_gene_id
+	where ga.name like :query
+	and ur.user_id = :uid) -->
+	union
+	(select ur.bait_upload_id as a
+	from user_results ur
+	where ur.bait_upload_id like :query
+	and ur.user_id = :uid)
+	union
+	(select ur.prey_upload_id as a 
+	from user_results ur
+	where ur.prey_upload_id like :query
+	and ur.user_id = :uid)
+	order by 1
+</sql-query>
+
+<sql-query name="GeneSymbols.byGeneIDs">
+	<return-scalar column="entrez_gene_id" type="long"/>
+	<return-scalar column="official_symbol" type="string"/>
+	select distinct g.entrez_gene_id, g.official_symbol
+	from genes g
+	inner join indistinguishable_temp i on i.id = g.entrez_gene_id
+</sql-query>
+</hibernate-mapping>

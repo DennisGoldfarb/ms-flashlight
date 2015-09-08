@@ -1,0 +1,264 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="edu.unc.flashlight.shared.model.UserResult" table="user_results">
+        <id name="id">
+            <column name="user_results_id" />
+            <generator class="identity" />
+        </id>
+       	<many-to-one name="user" class="edu.unc.flashlight.shared.model.User" column="user_id"/>
+        <many-to-one name="geneA" class="edu.unc.flashlight.shared.model.Gene" column="gene_id_a"/>
+        <many-to-one name="geneB" class="edu.unc.flashlight.shared.model.Gene" column="gene_id_b"/>
+        <many-to-one name="genePair" class="edu.unc.flashlight.shared.model.GenePair" column="gene_pair_hash"/>
+        <many-to-one name="classificationAlgorithm" class="edu.unc.flashlight.shared.model.ClassificationAlgorithm" column="classification_algorithm_id"/>
+        <property name="msScore" column="ms_score"/>
+        <property name="classifierScore" column="classifier_score"/>
+        <property name="uploadIdA" column="upload_id_a"/>
+        <property name="uploadIdB" column="upload_id_b"/>
+
+    </class>
+    
+<query name="UserResult.all">
+	from UserResult ur
+</query> 
+
+<query name="UserResult.deleteByOldUsers">
+	delete from UserResult ur
+	where ur.user.id in (select u.id from User u where :now >= u.createdTime and u.userType.id = 1)
+</query>
+
+<query name="UserResult.deleteByUser">
+	delete from UserResult ur
+	where ur.user.id = :id
+</query>
+
+<query name="getData">
+	from UserResult ur
+	left join fetch ur.genePair
+	left join fetch ur.geneA
+	left join fetch ur.geneB
+	where ur.user.id = :id
+	and ur.geneA.id != ur.geneB.id
+	order by ur.classifierScore desc, ur.msScore desc
+</query>
+
+
+
+<query name="getDataSearch">
+	from UserResult ur
+	left join fetch ur.genePair
+	inner join fetch ur.user
+	left join fetch ur.geneA
+	left join fetch ur.geneB
+	left join fetch ur.geneA.aliases as a
+	left join fetch ur.geneB.aliases as b
+	where ur.user.id = :id
+	and (ur.geneA.officialSymbol = :sym or ur.geneB.officialSymbol = :sym or :sym in a or :sym in b or ur.uploadIdA = :sym or ur.uploadIdB = :sym) 
+	order by ur.classifierScore desc, ur.msScore desc
+</query>
+
+<query name="getDataSearch.size">
+	select count(distinct ur)
+	from UserResult ur
+	left join ur.genePair
+	inner join ur.user
+	left join ur.geneA
+	left join ur.geneB
+	left join ur.geneA.aliases as a
+	left join ur.geneB.aliases as b
+	where ur.user.id = :id
+	and (ur.geneA.officialSymbol = :sym or ur.geneB.officialSymbol = :sym or :sym in a or :sym in b or ur.uploadIdA = :sym or ur.uploadIdB = :sym) 
+	order by ur.classifierScore desc, ur.msScore desc
+</query>
+
+<query name="getBrowseDataSearch">
+	from UserResult ur
+	left join fetch ur.genePair
+	inner join fetch ur.user
+	left join fetch ur.geneA
+	left join fetch ur.geneB
+	left join fetch ur.geneB.aliases as a
+	left join fetch ur.geneA.aliases as b
+	<!-- where ur.user.experimentRole.id = 1 -->
+	where ur.user.id in (select u.id from User u where u.experimentRole.id = 1)
+	and (ur.geneA.officialSymbol = :sym or ur.geneB.officialSymbol = :sym or :sym in a or :sym in b) 
+	order by ur.classifierScore desc, ur.msScore desc
+</query>
+
+<query name="getBrowseDataSearch.size">
+	select count(distinct ur)
+	from UserResult ur
+	left join ur.genePair
+	<!-- inner join fetch ur.user -->
+	left join ur.geneA
+	left join ur.geneB
+	left join ur.geneB.aliases as a
+	left join ur.geneA.aliases as b
+	<!-- where ur.user.experimentRole.id = 1 -->
+	where ur.user.id in (select u.id from User u where u.experimentRole.id = 1)
+	and (ur.geneA.officialSymbol = :sym or ur.geneB.officialSymbol = :sym or :sym in a or :sym in b) 
+	order by ur.classifierScore desc, ur.msScore desc
+</query>
+
+<query name="getBrowseData">
+	from UserResult ur
+	left join fetch ur.genePair
+	inner join fetch ur.user
+	left join fetch ur.geneA
+	left join fetch ur.geneB
+	<!-- where ur.user.experimentRole.id = 1 -->
+	where ur.user.id in (select u.id from User u where u.experimentRole.id = 1)
+	order by ur.classifierScore desc, ur.msScore desc
+</query>
+
+<query name="getBrowseData.size">
+	select count(ur)
+	from UserResult ur
+	join ur.user u
+	<!-- join ur.genePair  -->
+	where u.experimentRole.id = 1
+</query>
+
+<query name="getClassificationAlgorithm.byUser">
+	select ur.classificationAlgorithm.name
+	from UserResult ur
+	inner join ur.user
+	inner join ur.classificationAlgorithm
+	where ur.user.id = :uid
+</query>
+
+<sql-query name="getDataPerExp">
+	<return-scalar column="upload_id_a"/>
+	<return-scalar column="official_symbol"/>
+	<return-scalar column="bait_gene_id"/>
+	<return-scalar column="upload_id_b"/>
+	<return-scalar column="official_symbol"/>
+	<return-scalar column="prey_gene_id"/>
+	<return-scalar column="classifier_score"/>
+	<return-scalar column="ms_score"/>
+	<return-scalar column="es" type="java.lang.String"/>
+	<return-scalar column="cs" type="java.lang.String"/>
+	<return-scalar column="gene_pair_hash"/>
+	<return-scalar column="bp_score"/>
+	<return-scalar column="cc_score"/>
+	<return-scalar column="coxp_human_score"/>
+	<return-scalar column="coxp_mouse_score"/>
+	<return-scalar column="coxp_worm_score"/>
+	<return-scalar column="coxp_chicken_score"/>
+	<return-scalar column="coxp_fly_score"/>
+	<return-scalar column="coxp_rat_score"/>
+	<return-scalar column="coxp_fish_score"/>
+	<return-scalar column="domain_score"/>
+	<return-scalar column="homo_int_score"/>
+	<return-scalar column="human_phen_score"/>
+	<return-scalar column="mouse_phen_score"/>
+	<return-scalar column="disease_score"/>
+	<return-scalar column="is_known"/>
+	<![CDATA[
+	(select ur.upload_id_a, g1.official_symbol, e.bait_gene_id, ur.upload_id_b, g2.official_symbol, ed.prey_gene_id, 
+	ur.classifier_score, ur.ms_score,
+	group_concat(ed.spectral_count SEPARATOR "|") as es, 
+
+	(select group_concat(edc.spectral_count SEPARATOR "|") 
+	from experiments ec
+	inner join experiment_data edc on edc.experiment_id = ec.experiment_id 
+	where edc.prey_gene_id = ed.prey_gene_id
+	and ec.user_id = e.user_id
+	and ec.experiment_type_id = 1) as cs,
+	
+	gp.*
+	 
+	from user_results ur
+	inner join experiment_data ed on ed.gene_pair_hash = ur.gene_pair_hash
+	inner join experiments e on e.experiment_id = ed.experiment_id and e.user_id = ur.user_id
+	inner join genes g2 on g2.entrez_gene_id = ed.prey_gene_id
+	inner join genes g1 on g1.entrez_gene_id = e.bait_gene_id
+	left join gene_pairs gp on gp.gene_pair_hash = ur.gene_pair_hash
+	where e.user_id = :id and e.bait_gene_id <> ed.prey_gene_id
+	group by e.bait_gene_id, ed.prey_gene_id) 
+	<!-- union
+	(select ur.upload_id_a, g1.official_symbol, e.bait_gene_id, ur.upload_id_b, g2.official_symbol, ed.prey_gene_id, 
+	ur.classifier_score, ur.ms_score,
+	group_concat(ed.spectral_count SEPARATOR "|") as es, 
+
+	(select group_concat(edc.spectral_count SEPARATOR "|") 
+	from experiments ec
+	inner join experiment_data edc on edc.experiment_id = ec.experiment_id 
+	where edc.prey_gene_id = ed.prey_gene_id
+	and ec.user_id = e.user_id
+	and ec.experiment_type_id = 1) as cs,
+	
+	gp.*
+	 
+	from user_results ur
+	inner join experiment_data ed on ed.prey_upload_id = ur.upload_id_b
+	inner join experiments e on e.experiment_id = ed.experiment_id and e.user_id = ur.user_id and e.bait_upload_id = ur.upload_id_a
+	left join genes g2 on g2.entrez_gene_id = ed.prey_gene_id
+	left join genes g1 on g1.entrez_gene_id = e.bait_gene_id
+	left join gene_pairs gp on gp.gene_pair_hash = ur.gene_pair_hash
+	where e.user_id = :id and ur.gene_pair_hash is null
+	and e.bait_upload_id <> ed.prey_upload_id
+	group by e.bait_upload_id, ed.prey_upload_id)
+	order by 1 -->
+	]]>
+</sql-query>
+
+<query name="getData.size">
+	select count(ur.id)
+	from UserResult ur
+	join ur.user u
+	<!-- left join ur.genePair -->
+	where u.id = :id
+</query>
+
+
+</hibernate-mapping>

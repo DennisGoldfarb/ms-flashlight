@@ -1,0 +1,228 @@
+<project name="flashlight" default="init-ivy" basedir="."
+	xmlns:ivy="antlib:org.apache.ivy.ant">
+	
+	<description>
+        Build file for the flashlight project.
+    </description>
+	
+	<!-- set global properties for this build -->
+ 	<property name="src" location="src"/>
+	<property name="test" location="test"/>
+	<property name="lib.dir" location="war/WEB-INF/lib"/>
+	<property name="lib-local.dir" location="lib-local"/>
+	<property name="hibernate_cfg" value="src/hibernate.cfg.xml" />
+
+	<property name="jar.name" value="flashlight.jar"/>
+	<property name="war.name" value="flashlight.war"/>
+	<property name="build.dir" location="build"/>
+	<property name="gwt.module.name" value="edu.unc.flashlight.Flashlight"/>
+	<property name="gwt.client.dir" location="edu/unc/flashlight/client"/>
+	<property name="dist.dir" location="dist"/>
+	
+	
+	<path id="project.classpath">     
+		<fileset dir="${lib.dir}">         
+			<include name="**/*.jar" />  
+			<exclude name="gwt-servlet.jar"/>
+		</fileset>
+	</path> 
+	
+	<target name="prepare">
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+	</target>
+	
+	<target name="compile" depends="prepare">
+		<javac srcdir="${src}" destdir="${build.dir}" includeantruntime="false">
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+		
+	<target name="gwt-compile" depends="compile">
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+			<classpath>
+				<pathelement location="${src}"/>
+				<pathelement location="${build.dir}"/>
+				<path refid="project.classpath"/>
+			</classpath>
+			<jvmarg value="-Xmx4G"/>
+			<arg value="${gwt.module.name}"/>
+		</java>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<jar destfile="${lib.dir}/${jar.name}" basedir="${build.dir}/">
+			<exclude name="${gwt.client.dir}}/**/*.class"/>
+		</jar>
+	</target>
+	
+	
+	<target name="copy-resources">
+		<copy todir="${build.dir}" preservelastmodified="true">
+			<fileset dir="${src}">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="war" depends="gwt-compile,copy-resources,jar">
+		<war basedir="war" destfile="${war.name}" webxml="war/WEB-INF/web.xml">
+			<exclude name="WEB-INF/**"/>
+			<!-- <exclude name="${server.resources.name}/**"/> -->
+			<webinf dir="war/WEB-INF/">
+				<!--<include name="classes/${server.resources.name}/**"/>-->
+				<include name="**/*.jar"/>
+				<exclude name="**/gwt-dev.jar"/>
+				<exclude name="**/gwt-user.jar"/>
+				<exclude name="**/servlet-api*"/>
+			</webinf>
+		</war>
+	</target>
+	
+	
+	<target name="deploy" depends="war">
+		<move file="flashlight.war" todir="${dist.dir}" />
+	</target>
+	
+	
+	
+	
+	<property file="build.properties" />
+	<filterset id="props">
+            <filter token="DB_USER" value="${DB_USER}" />
+            <filter token="DB_PASS" value="${DB_PASS}" />
+            <filter token="DB_URL" value="${DB_URL}" />
+            <filter token="DB_DIALECT" value="${DB_DIALECT}" />
+            <filter token="DB_DRIVER" value="${DB_DRIVER}" />
+    </filterset>
+	
+	<!-- Library files for classpath -->
+    <path id="libs">
+            <fileset dir="${lib.dir}" includes="**/*.jar" />
+    		<fileset dir="${lib-local.dir}" includes="**/*.jar" />
+    </path>
+	
+	<!-- set global properties to bootstrap ivy (our dependency management tool)-->
+	<property name="ivy.install.version" value="2.1.0-rc2" />
+    <condition property="ivy.home" value="${env.IVY_HOME}">
+      <isset property="env.IVY_HOME" />
+    </condition>
+    <property name="ivy.home" value="${user.home}/.ant" />
+    <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+	
+	<!-- ======================================================================= 
+		      target: download-ivy    							   downloads ivy             
+		 =======================================================================  -->
+	<target name="download-ivy" unless="offline" description="Downloads ivy, our dependency managment tool. Don't run this directly.">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <!-- download Ivy from web site so that it can be used even without any special installation -->
+        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
+             dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+	
+	
+	<!-- ======================================================================= 
+		      target: init-ivy 			 initializes ivy, downloads it if needed             
+		 =======================================================================  -->
+    <target name="init-ivy" depends="download-ivy" description="Initializes ivy. If it's not already installed, it will be downloaded. Don't run this directly.">
+      <!-- try to load ivy here from ivy home, in case the user has not already dropped
+              it into ant's lib dir (note that the latter copy will always take precedence).
+              We will not fail as long as local lib dir exists (it may be empty) and
+              ivy is in at least one of ant's lib dir or the local lib dir. -->
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+	
+	<!-- ======================================================================= 
+	          target: resolve-mysql	           Gets the libraries the project depends on (with a mysql db)            
+	     =======================================================================  -->
+    <target name="resolve-mysql" depends="init-ivy, copy-local-libs" description="Retrieve dependencies with ivy">
+        <ivy:retrieve pattern="${lib.dir}/[artifact]-[revision].[ext]" conf="mysql"/>
+    </target>
+	
+	<!-- ======================================================================= 
+	          target: resolve-sql-server	   Gets the libraries the project depends on (with a sql-server db)            
+	     =======================================================================  -->
+    <target name="resolve-sql-server" depends="init-ivy, copy-local-libs" description="Retrieve dependencies with ivy">
+        <ivy:retrieve pattern="${lib.dir}/[artifact]-[revision].[ext]" conf="sql-server"/>
+    </target>
+	
+	<target name="copy-local-libs" description="copies the local libs into WEB-INF/lib for runtime dependency">
+    	<copy todir="${lib.dir}">
+    	  <fileset dir="${lib-local.dir}"/>
+    	</copy>
+	</target>
+
+	<!-- ======================================================================= 
+	          target: properties-mysql	   Generates the build.properties file for mysql            
+	     =======================================================================  -->
+    <target name="properties-mysql" description="Generates the build.properties file for mysql">
+        <echo file="build.properties">
+DB_DRIVER=com.mysql.jdbc.Driver
+DB_PASS=[YOUR_PASSWORD]
+DB_URL=[Something like-> jdbc:mysql://sql1.csbio.unc.edu/signal]
+DB_USER=[YOUR_USER]
+DB_DIALECT=org.hibernate.dialect.MySQLDialect
+        </echo>
+    </target>	
+	
+	<!-- ======================================================================= 
+	          target: properties-sql-server	   Generates the build.properties file for sql-server            
+	     =======================================================================  -->
+    <target name="properties-sql-server" description="Generates the build.properties file for sql-server">
+        <echo file="build.properties">
+DB_DRIVER=net.sourceforge.jtds.jdbc.Driver
+DB_PASS=[YOUR_PASSWORD]
+DB_URL=[Something like-> jdbc:jtds:sqlserver://XX.XX.XXX.XX:YYYY/DB-NAME]
+DB_USER=[YOUR_USER]
+DB_DIALECT=org.hibernate.dialect.SQLServerDialect
+        </echo>
+    </target>
+	
+	<!-- ======================================================================= 
+	          target: generate-hibernate	   Generates the hibernate.cfg.xml file using build.properties           
+	     =======================================================================  -->
+    <target name="generate-hibernate" description="Generates the build.properties file for mysql">
+    	<delete file="${hibernate_cfg}" />
+        <copy tofile="${hibernate_cfg}" file="hibernate.cfg.in.xml">
+                <filterset refid="props" />
+        </copy>
+    </target>	
+	
+	<target name="generate-classpath" description="Sets up eclipse by generating the .classpath file">
+		<pathconvert property="libs.e" dirsep="/" pathsep="&quot;/&gt;&#10;&#09;&lt;classpathentry kind=&quot;lib&quot; path=&quot;">
+            <path refid="libs" />
+            <map from="${basedir}/" to="" />
+		</pathconvert>
+				
+			<echo file=".classpath">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;classpath&gt;
+	&lt;classpathentry kind="src" path="src"/&gt;
+	&lt;classpathentry kind="src" output="test-classes" path="test"/&gt;
+	&lt;classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/&gt;
+	&lt;classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/&gt;
+	&lt;classpathentry kind="output" path="war/WEB-INF/classes"/&gt;
+	&lt;classpathentry kind=&quot;lib&quot; path=&quot;${libs.e}&quot;/&gt;
+&lt;/classpath&gt;
+			</echo>
+		</target>
+	
+	<target name="eclipse-mysql" depends="resolve-mysql, generate-classpath, generate-hibernate" description="Sets up the project">	
+	</target>
+	
+	<target name="eclipse-sql-server" depends="resolve-sql-server, generate-classpath, generate-hibernate" description="Sets up the project">	
+	</target>
+		
+  	<target name="clean" description="clean up" >
+  		<delete dir="${lib.dir}">
+  			<exclude name="gwt-servlet.jar"/>
+  		</delete>
+  		<delete dir="${build.dir}"/>
+  		<delete dir="${dist.dir}"/>
+  	</target>
+
+
+</project>

@@ -1,0 +1,102 @@
+/*******************************************************************************
+ * Copyright 2012 The University of North Carolina at Chapel Hill.
+ *  All Rights Reserved.
+ * 
+ *  Permission to use, copy, modify OR distribute this software and its
+ *  documentation for educational, research and non-profit purposes, without
+ *  fee, and without a written agreement is hereby granted, provided that the
+ *  above copyright notice and the following three paragraphs appear in all
+ *  copies.
+ * 
+ *  IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+ *  LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+ *  CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+ *  USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+ *  OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+ *  DAMAGES.
+ * 
+ *  THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+ *  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ *  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+ *  PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+ *  NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+ *  UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+ * 
+ *  The authors may be contacted via:
+ * 
+ *  US Mail:           Dennis Goldfarb
+ *                     Wei Wang
+ * 
+ *                     Department of Computer Science
+ *                       Sitterson Hall, CB #3175
+ *                       University of N. Carolina
+ *                       Chapel Hill, NC 27599-3175
+ * 
+ *                     Ben Major
+ * 
+ *                     Department of Cell Biology and Physiology 
+ *                       Lineberger Comprehensive Cancer Center
+ *                       University of N. Carolina
+ *                       Chapel Hill, NC 27599-3175
+ * 
+ *  Email:             dennisg@cs.unc.edu
+ *                     weiwang@cs.unc.edu
+ *                     ben_major@med.unc.edu
+ * 
+ *  Web:               www.unc.edu/~dennisg/
+ ******************************************************************************/
+package edu.unc.flashlight.server.dao;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import edu.unc.flashlight.shared.model.ExperimentRole;
+import edu.unc.flashlight.shared.model.User;
+import edu.unc.flashlight.shared.model.UserType;
+
+public class UserDAO extends GenericDAO<User>{
+
+	public UserDAO(Session session) {
+		super(session);
+	}
+
+	public User save(User inst) {
+		session.saveOrUpdate(inst);
+		return inst;
+	}
+	
+	public User load(long id) {
+		User u = (User) session.load(User.class, id);
+		u.getId();
+		return u;
+	}
+	
+	public User getCurrentOrNewUser(long id) {
+		if (id == -1) return createGuestUser();
+		else return load(id);
+	}
+	
+	public User createGuestUser() {
+		User u = new User();
+		u.setUserType((UserType) session.getNamedQuery("UserType.byName")
+				.setString("name", "Guest").uniqueResult());
+		u.setExperimentRole((ExperimentRole) session.getNamedQuery("ExperimentRole.byName")
+				.setString("name", "Private").uniqueResult());
+		return save(u);
+	}
+	
+	public void deleteDataForOldUsers(Timestamp now) {
+		Query q = session.getNamedQuery("User.deleteByOldUsers");
+		q.setTimestamp("now", now);
+		q.executeUpdate();
+	}
+	
+	public List<User> getPublicUsers() {
+		Query q = session.getNamedQuery("User.getPublic");
+		return q.list();
+	}
+
+}

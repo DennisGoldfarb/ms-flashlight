@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="edu.unc.flashlight.shared.model.Experiment" table="experiments">
+        <id name="id">
+            <column name="experiment_id" />
+            <generator class="identity" />
+        </id>
+        <property name="name"/>
+        <many-to-one name="user" class="edu.unc.flashlight.shared.model.User" column="user_id"/>
+        <many-to-one name="bait" class="edu.unc.flashlight.shared.model.Gene" column="bait_gene_id"/>
+        <many-to-one name="experimentRole" class="edu.unc.flashlight.shared.model.ExperimentRole" column="experiment_role_id"/>
+        <many-to-one name="experimentType" class="edu.unc.flashlight.shared.model.ExperimentType" column="experiment_type_id"/>
+		<set name="data" inverse="true">
+	        <key column="experiment_id"/>
+	        <one-to-many class="edu.unc.flashlight.shared.model.ExperimentData"/>
+    	</set>
+    	<property name="baitUploadId" column="bait_upload_id"/>
+
+    </class>
+    
+<query name="Experiment.all">
+	from Experiment e
+</query> 
+
+<query name="Experiment.deleteByOldUsers">
+	delete from Experiment e
+	where e.user.id in (select u.id from User u where :now >= u.createdTime and u.userType.id = 1)
+</query>
+
+<query name="Experiment.deleteByUser">
+	delete from Experiment e
+	where e.user.id = :id
+</query> 
+
+<sql-query name="ExperimentName.byExperimentName">
+    <return-scalar column="name" type="string"/>
+    select name from experiments inner join exp_temp t on t.id = name and user_id = :id
+</sql-query>
+
+<sql-query name="Experiment.baitsByUser">
+	<return-scalar column="e.experiment_id" type="long"/>
+    <return-scalar column="e.bait_gene_id" type="long"/>
+    <return-scalar column="e.bait_upload_id" type="string"/><![CDATA[
+	select e.experiment_id, e.bait_gene_id, e.bait_upload_id
+	from experiments e
+	where e.user_id in (:selected_ids)
+	and e.experiment_type_id = :exp_type
+	]]>
+</sql-query>
+
+<sql-query name="Experiment.expByUser">
+    <return-scalar column="e.experiment_id" type="long"/><![CDATA[
+	select e.experiment_id
+	from experiments e
+	where e.user_id in (:selected_ids)
+	and e.experiment_type_id = :exp_type
+	]]>
+</sql-query>
+
+</hibernate-mapping>

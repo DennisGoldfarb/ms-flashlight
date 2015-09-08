@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="edu.unc.flashlight.shared.model.GenePair" table="gene_pairs">
+         <id name="id">
+            <column name="gene_pair_hash" />
+            <generator class="native" />
+        </id>
+        <property name="bpScore" column="bp_score"/>
+        <property name="ccScore" column="cc_score"/>
+        <property name="coxpHumanScore" column="coxp_human_score"/>
+        <property name="coxpMouseScore" column="coxp_mouse_score"/>
+        <property name="coxpWormScore" column="coxp_worm_score"/>
+        <property name="coxpChickenScore" column="coxp_chicken_score"/>
+        <property name="coxpFlyScore" column="coxp_fly_score"/>
+        <property name="coxpRatScore" column="coxp_rat_score"/>
+        <property name="coxpFishScore" column="coxp_fish_score"/>
+        <property name="domainScore" column="domain_score"/>
+        <property name="humanIntScore" column="homo_int_score"/>
+        <property name="humanPhenScore" column="human_phen_score"/>
+        <property name="mousePhenScore" column="mouse_phen_score"/>
+        <property name="diseaseScore" column="disease_score"/>
+        <property name="isKnown" column="is_known"/>
+    </class>
+
+<query name="GenePair.all">
+	from GenePair g
+</query> 
+
+<sql-query name="GenePair.getScores">
+	<return-scalar column="gp.gene_pair_hash" type="string"/>
+    <return-scalar column="gp.bp_score" type="double"/>
+    <return-scalar column="gp.cc_score" type="double"/>
+    <return-scalar column="gp.coxp_human_score" type="double"/>
+    <return-scalar column="gp.coxp_mouse_score" type="double"/>
+    <return-scalar column="gp.coxp_worm_score" type="double"/>
+    <return-scalar column="gp.coxp_chicken_score" type="double"/>
+    <return-scalar column="gp.coxp_fly_score" type="double"/>
+    <return-scalar column="gp.coxp_rat_score" type="double"/>
+    <return-scalar column="gp.coxp_fish_score" type="double"/>
+    <return-scalar column="gp.domain_score" type="double"/>
+    <return-scalar column="gp.homo_int_score" type="integer"/>
+    <return-scalar column="gp.human_phen_score" type="double"/>
+    <return-scalar column="gp.mouse_phen_score" type="double"/>
+    <return-scalar column="gp.disease_score" type="double"/>
+    select gp.*
+    from gene_pairs gp right join hash_temp t on t.id = gp.gene_pair_hash
+    order by gp.gene_pair_hash
+</sql-query>
+
+<sql-query name="getBestCoexpressionHomolog">
+ 	<return-scalar column="c.gene_id_a" type="long"/>
+    <return-scalar column="c.gene_id_b" type="long"/>
+    <return-scalar column="c.PCC" type="float"/>
+	select c.gene_id_a, c.gene_id_b, c.PCC from coxpress c,
+	(select gene_id, group_id from homologene where gene_id = :gene_id_a) as hg1,
+	(select gene_id, group_id from homologene where gene_id = :gene_id_b) as hg2,
+	(select gene_id, group_id from homologene where tax_id = :tax_id) as h1,
+	(select gene_id, group_id from homologene where tax_id = :tax_id) as h2
+	where c.gene_id_a = h1.gene_id and hg1.group_id = h1.group_id
+	and c.gene_id_b = h2.gene_id and hg2.group_id = h2.group_id 
+	order by c.PCC desc
+</sql-query>
+
+<sql-query name="getBestCoexpressionHuman">
+    <return-scalar column="c.PCC" type="float"/>
+	select c.gene_id_a, c.gene_id_b, c.PCC from coxpress c
+	where c.gene_id_a = :gene_id_a
+	and c.gene_id_b = :gene_id_b
+	order by c.PCC desc
+</sql-query>
+
+
+
+</hibernate-mapping>

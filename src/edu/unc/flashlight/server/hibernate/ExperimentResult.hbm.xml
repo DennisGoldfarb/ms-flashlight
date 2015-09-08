@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+ 
+<hibernate-mapping>
+    <class name="edu.unc.flashlight.shared.model.ExperimentResult" table="experiment_results">
+        <id name="id">
+            <column name="experiment_result_id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="experiment" class="edu.unc.flashlight.shared.model.Experiment" column="experiment_id"/>
+        <many-to-one name="prey" class="edu.unc.flashlight.shared.model.Gene" column="prey_gene_id"/>
+        <many-to-one name="genePair" class="edu.unc.flashlight.shared.model.GenePair" column="gene_pair_hash"/>
+        <property name="spectralCount" column="spectral_count"/>
+        <property name="abundance"/>
+        <property name="uniqueness"/>
+        <property name="msScore" column="ms_score"/> 
+        <property name="classifierScore" column="classifier_score"/>
+        
+
+    </class>
+    
+<query name="ExperimentResult.all">
+	from ExperimentResult er
+</query> 
+
+<query name="ExperimentResult.byPreyID">
+	from ExperimentResult er
+	inner join fetch er.experiment
+	inner join fetch er.experiment.bait
+	inner join fetch er.prey
+	where er.prey.id = :prey_id
+	and (2 >= er.experiment.experimentRole.id or er.experiment.user.id = :user_id)
+	group by er.experiment.bait.id
+</query>
+
+
+
+<sql-query name="getBait2ap2count">
+	<return-scalar column="e.affinity_purification_type_id" type="long"/>
+    <return-scalar column="e.bait_gene_id" type="long"/>
+    <return-scalar column="repro" type="int"/><![CDATA[
+	select e.bait_gene_id, e.affinity_purification_type_id, count(1) as repro
+	from experiments e
+	where (e.experiment_role_id <= 2 or e.user_id = :id)
+	group by e.bait_gene_id, e.affinity_purification_type_id
+	]]>
+</sql-query>
+
+<sql-query name="getTotalPerExp">
+	<return-scalar column="er.experiment_id" type="long"/>
+    <return-scalar column="abundance" type="double"/><![CDATA[
+    select er.experiment_id, sum(er.spectral_count/g.num_observable_peps) as abundance
+	
+	from experiment_results er
+	inner join experiments e on e.experiment_id = er.experiment_id 
+	inner join (select distinct er3.prey_gene_id 
+	            from experiment_results er3 
+	            inner join experiments e3 on e3.experiment_id = er3.experiment_id
+	            where e3.user_id = :id) as myTmp on myTmp.prey_gene_id = er.prey_gene_id
+	inner join genes g on g.entrez_gene_id = er.prey_gene_id
+	where (e.experiment_role_id <= 2 or e.user_id = :id)
+	group by e.experiment_id
+	]]>
+</sql-query>
+
+<sql-query name="getDataForScores3">
+<return-scalar column="er.prey_gene_id" type="long"/>
+    <return-scalar column="e.affinity_purification_type_id" type="long"/>
+    <return-scalar column="abundance" type="double"/>
+    <return-scalar column="bait" type="long"/>
+    <return-scalar column="er.experiment_id" type="long"/><![CDATA[
+    select er.prey_gene_id, e.affinity_purification_type_id, sum(er.spectral_count/length(s.sequence)) as abundance, 
+	(e.bait_gene_id) as bait, er.experiment_id
+	
+	from experiment_results er
+	inner join experiments e on e.experiment_id = er.experiment_id 
+	inner join (select distinct er3.prey_gene_id 
+	            from experiment_results er3 
+	            inner join experiments e3 on e3.experiment_id = er3.experiment_id
+	            where e3.user_id = :id) as myTmp on myTmp.prey_gene_id = er.prey_gene_id
+	inner join genes g on g.entrez_gene_id = er.prey_gene_id
+	inner join gene_sequences gs on gs.gene_id = g.entrez_gene_id
+	inner join sequences s on s.sequence_id = gs.sequence_id
+	where (e.experiment_role_id <= 2 or e.user_id = :id)
+	group by er.prey_gene_id, e.affinity_purification_type_id, e.bait_gene_id, e.experiment_id
+	]]>
+</sql-query>
+
+<sql-query name="getDataForScores2">
+<return-scalar column="er.prey_gene_id" type="long"/>
+    <return-scalar column="e.affinity_purification_type_id" type="long"/>
+    <return-scalar column="abundance" type="double"/>
+    <return-scalar column="bait" type="long"/>
+    <return-scalar column="er.experiment_id" type="long"/><![CDATA[
+    select er.prey_gene_id, e.affinity_purification_type_id, sum(er.spectral_count) as abundance, 
+	(e.bait_gene_id) as bait, er.experiment_id
+	
+	from experiment_results er
+	inner join experiments e on e.experiment_id = er.experiment_id 
+	inner join (select distinct er3.prey_gene_id 
+	            from experiment_results er3 
+	            inner join experiments e3 on e3.experiment_id = er3.experiment_id
+	            where e3.user_id = :id) as myTmp on myTmp.prey_gene_id = er.prey_gene_id
+	inner join genes g on g.entrez_gene_id = er.prey_gene_id
+	where (e.experiment_role_id <= 2 or e.user_id = :id)
+	group by er.prey_gene_id, e.affinity_purification_type_id, e.bait_gene_id, e.experiment_id
+	]]>
+</sql-query>
+
+<sql-query name="getDataForScores">
+	<return-scalar column="er.prey_gene_id" type="long"/>
+    <return-scalar column="e.affinity_purification_type_id" type="long"/>
+    <return-scalar column="abundance" type="string"/>
+    <return-scalar column="baits" type="string"/><![CDATA[
+	
+	select er.prey_gene_id, e.affinity_purification_type_id, 
+	group_concat(er.spectral_count/g.num_observable_peps) as abundance, 
+	group_concat(distinct e.bait_gene_id) as baits
+	
+	from experiment_results er
+	inner join experiments e on e.experiment_id = er.experiment_id 
+	inner join (select distinct er3.prey_gene_id 
+	            from experiment_results er3 
+	            inner join experiments e3 on e3.experiment_id = er3.experiment_id
+	            where e3.user_id = 1) as myTmp on myTmp.prey_gene_id = er.prey_gene_id
+	inner join genes g on g.entrez_gene_id = er.prey_gene_id
+	where (e.experiment_role_id <= 2 or e.user_id = :id)
+	group by er.prey_gene_id, e.affinity_purification_type_id
+	
+	]]>
+</sql-query>
+
+<sql-query name="getSimilarGenes">
+	<return-scalar column="er.prey_gene_id" type="long"/>
+    <return-scalar column="gp.gene_id_b" type="long"/>
+    <return-scalar column="gp.seq_similarity_score" type="double"/>
+    <![CDATA[
+	select er.prey_gene_id, gp.gene_id_b, gp.seq_similarity_score
+	from experiments e
+	inner join experiment_results er on er.experiment_id = e.experiment_id
+	inner join gene_pairs_s_spec gp on gp.gene_id_a = er.prey_gene_id
+	inner join experiment_results er2 on e.experiment_id = er2.experiment_id and er2.prey_gene_id = gp.gene_id_b
+	where gp.seq_similarity_score >= :threshold
+	and e.user_id = :id
+	group by er.prey_gene_id, gp.gene_id_b
+	]]>
+</sql-query>
+
+<sql-query name="updateExperimentResult">
+	<![CDATA[
+	update experiment_results er, experiments e
+	set er.ms_score = :score, er.classifier_score = :classifier , er.abundance = :abundance, er.uniqueness = :uniquness
+	where er.experiment_id = e.experiment_id
+	and er.prey_gene_id = :preyID and e.bait_gene_id = :baitID and e.user_id = :userID
+	]]>
+</sql-query>
+
+</hibernate-mapping>

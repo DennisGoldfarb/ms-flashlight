@@ -1,0 +1,266 @@
+<!--
+  Copyright 2012 The University of North Carolina at Chapel Hill.
+   All Rights Reserved.
+  
+   Permission to use, copy, modify OR distribute this software and its
+   documentation for educational, research and non-profit purposes, without
+   fee, and without a written agreement is hereby granted, provided that the
+   above copyright notice and the following three paragraphs appear in all
+   copies.
+  
+   IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+   LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+   CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+   USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+   OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGES.
+  
+   THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+   PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+   NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+   UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+  
+   The authors may be contacted via:
+  
+   US Mail:           Dennis Goldfarb
+                      Wei Wang
+  
+                      Department of Computer Science
+                        Sitterson Hall, CB #3175
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+                      Ben Major
+  
+                      Department of Cell Biology and Physiology 
+                        Lineberger Comprehensive Cancer Center
+                        University of N. Carolina
+                        Chapel Hill, NC 27599-3175
+  
+   Email:             dennisg@cs.unc.edu
+                      weiwang@cs.unc.edu
+                      ben_major@med.unc.edu
+  
+   Web:               www.unc.edu/~dennisg/
+-->
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+				xmlns:g="urn:import:com.google.gwt.user.client.ui">
+				
+	<g:HTMLPanel>
+		<div>
+			<div id="uploadPanel"> 
+				<p>A detailed description of Spotlite can be found in our paper:<br/>
+					<a href="http://pubs.acs.org/doi/abs/10.1021/pr5008416" target="_blank">
+						Spotlite: Web Application and Augmented Algorithms for Predicting Co-Complexed Proteins 
+						from Affinity Purification - Mass Spectrometry Data.
+					</a>
+				</p>
+				<h2>Upload Instructions</h2>
+				<h3>Input File Format</h3>
+				<p>The input to Spotlite is a tab-delimited file containing five columns. A header is optional. If a header is present it must
+				match the example below.
+				We recommend stringent cutoffs for protein identifications, such as a 1% FDR. For best results, experiments 
+				should use the same purification technique, protocols, and mass spectrometer. The format of the file is as follows:</p>
+				<table class="t1">
+					<tbody>
+						<tr>
+							<td>Experiment ID</td>
+							<td>Experiment Type</td>
+							<td>Bait</td>
+							<td>Prey</td>
+							<td>Spectral Count</td>
+						</tr>
+					</tbody>
+				</table>
+				<div align="left">
+					<p><b>Experiment IDs</b> can be any combination of numbers or letters. Each experiment must have a unique ID.</p>
+					<p><b>Experiment Type</b> must be one of the following: T, or C. T=Test and C=Control</p>
+					<p><b>Bait</b> and <b>Prey</b> must be either an Entrez Gene ID, IPI or UniProt Accession, or a Gene Symbol.
+						Other identifiers are allowed, but will not be mapped to an Entrez Gene ID and therefore Spotlite will only
+						use APMS data for scoring that interaction. For control experiments, the <b>Bait</b> identifier can be anything.</p>
+					<p><b>Spectral Count</b> is an integer representing the total number of spectra for the corresponding prey.</p>
+				</div>
+				<h3>Example</h3>
+					<table class="t1">
+						<tbody>
+							<tr>
+								<th>Experiment ID</th><th>Experiment Type</th><th>Bait</th><th>Prey</th><th>Spectral Count</th>
+							</tr>
+							<tr>
+								<td>EXP_1</td><td>T</td><td>KEAP1</td><td>KEAP1</td><td>200</td>
+							</tr>
+							<tr>
+								<td>EXP_1</td><td>T</td><td>KEAP1</td><td>Q16236</td><td>5</td>
+							</tr>
+							<tr>
+								<td>EXP_2</td><td>T</td><td>CTNNB1</td><td>CTNNB1</td><td>100</td>
+							</tr>
+							<tr>
+								<td>EXP_2</td><td>T</td><td>CTNNB1</td><td>9817</td><td>17</td>
+							</tr>
+							<tr>
+								<td>Control_1</td><td>C</td><td>EmptyVector</td><td>KRT17</td><td>44</td>
+							</tr>
+						</tbody>
+					</table>
+				
+				<h2>APMS Algorithm Choices</h2>
+				<h3>CompPASS WD-score</h3>
+					<p>A thorough description of the CompPASS WD-score is located <a href="http://falcon.hms.harvard.edu/ipmsmsdbs/cgi-bin/tutorial.cgi" target="_blank">here</a>. The WD-score's classification performance is hampered by very densely connected datasets as it is reliant on the uniqueness of prey.</p>
+				<h3>HSCore</h3>
+					<p>HGSCore is defined in in <a href="http://www.cell.com/abstract/S0092-8674(11)01080-4" target="_blank">this publication</a>. Its classification performance is best on large datasets where bait and prey are often tested in both directions.</p>
+				<h3>SAINT</h3>
+					<p>Spotlite uses <a href="http://saint-apms.sourceforge.net/Main.html" target="_blank">SAINTexpress</a> (version 3.1.0) because its fast computational speed is necessary for calculating p-values via permutations. SAINTexpress requires at least two control experiments and is the best method for datasets containing few baits.</p>
+					
+				<h2>Permutations</h2>
+					<p>Permutations of the APMS dataset are performed to calculated p-values. 
+					For HGSCore, permutations are continued until the number of permuted interactions is equal to 200x 
+					the number of unique interactions of the original dataset. For SAINT and CompPASS - whose score 
+					distribution is conditional on the number of replicates - permutations are continued until each replicate group
+					has 200x the number of unique interactions. This can lead to long runtimes if, for example, a dataset contains 100 baits 
+					with two replicates each and 1 bait with 1 replicate, because each dataset permutation will generate very few 
+					interactions with 1 replicate.</p>
+					
+				<h2>Spotlite Column Descriptions</h2>
+				<div align="left">
+					<table class="t1">
+						<tbody>
+							<tr>
+								<th>Column Name</th>
+								<th>Column Description</th>
+								<th>Database Minimum</th>
+								<th>Database Maximum</th>
+							</tr>
+							<tr>
+								<td>Classifier Score</td>
+								<td>Probability of interaction based on our Spotlite logistic regression classifier.</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>APMS Score</td>
+								<td>APMS score calculated using your chosen algorithm.</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>APMS Pvalue</td>
+								<td>P-value calculated for the APMS score. The p-value is conditional on the number of replicates when using CompPASS or SAINT.</td>
+								<td></td>
+								<td></td>
+							</tr>
+							<tr>
+								<td>BP</td>
+								<td>Semantic similarity for GO Biological Process annotations.</td>
+								<td>0.12814</td>
+								<td>1.9989</td>
+							</tr>
+							<tr>
+								<td>CC</td>
+								<td>Semantic similarity for GO Cellular Component annotations.</td>
+								<td>0.073278</td>
+								<td>1.9989</td>
+							</tr>
+							<tr>
+								<td>CXP Hsa</td>
+								<td>Pearson's correlation coefficient (PCC) for human co-expression patterns.</td>
+								<td>-0.389</td>
+								<td>0.9698</td>
+							</tr>
+							<tr>
+								<td>CXP Mmu</td>
+								<td>PCC for the highest co-expression patterns among a protein pair's mouse homologs.</td>
+								<td>-0.3597</td>
+								<td>0.9415</td>
+							</tr>
+							<tr>
+								<td>CXP Cel</td>
+								<td>PCC for the highest co-expression patterns among a protein pair's C. elegans homologs.</td>
+								<td>-0.6232</td>
+								<td>0.9356</td>
+							</tr>
+							<tr>
+								<td>CXP Gga</td>
+								<td>PCC for the highest co-expression patterns among a protein pair's chicken homologs.</td>
+								<td>-0.7407</td>
+								<td>0.9771</td>
+							</tr>
+							<tr>
+								<td>CXP Rno</td>
+								<td>PCC for the highest co-expression patterns among a protein pair's rat homologs.</td>
+								<td>-0.8839</td>
+								<td>0.9267</td>
+							</tr>
+							<tr>
+								<td>CXP Dre</td>
+								<td>PCC for the highest co-expression patterns among a protein pair's zebrafish homologs.</td>
+								<td>-0.6203</td>
+								<td>0.9629</td>
+							</tr>
+							<tr>
+								<td>CXP Mcc</td>
+								<td>PCC for the highest co-expression patterns among a protein pair's rhesus macaque monkey homologs.</td>
+								<td>-0.7918</td>
+								<td>0.959</td>
+							</tr>
+							<tr>
+								<td>Domain</td>
+								<td>Probability of the protein pairs interacting determined by the probability of any of their domains interacting.</td>
+								<td>0.000215</td>
+								<td>0.3392</td>
+							</tr>
+							<tr>
+								<td>Homo int</td>
+								<td>Number of homolog pairs previously annotated to form a complex with each other.</td>
+								<td>0.000567</td>
+								<td>1.0</td>
+							</tr>
+							<tr>
+								<td>Hsa phen</td>
+								<td>Semantic similarity for the Human Phenotype Ontology. <b>Not part of classifier: annotation only.</b></td>
+								<td>0.16651</td>
+								<td>0.19989</td>
+							</tr>
+							<tr>
+								<td>Mmu phen</td>
+								<td>Semantic similarity for the Mammalian Phenotype Ontology - mouse mutant phenotypes. <b>Not part of classifier: annotation only.</b></td>
+								<td>0.16639</td>
+								<td>0.19989</td>
+							</tr>
+							<tr>
+								<td>Disease</td>
+								<td>Semantic similarity for the Disease Ontology - human disease. <b>Not part of classifier: annotation only.</b></td>
+								<td>0.047714</td>
+								<td>0.19989</td>
+							</tr>
+							<tr>
+								<td>Known</td>
+								<td>Previously known interactions from BioGRID are annotated with "L" for low-throughput experiments and "H" for high-throughput. <b>Not part of classifier: annotation only.</b></td>
+								<td></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>						
+				</div>
+				<h2>Database Version</h2>
+					<p>Gene information, protein sequences, ontologies, domains, and protein-protein interactions were last updated on <b>10/05/13</b>.</p>
+				<h2>False Discovery Rate</h2>
+				<p>We use the Benjamini-Hochberg method to compute false discovery rates (FDR) for data based on APMS scores only. FDRs for Spotlite classifier results will be available in the future.</p> 
+				<p>First, APMS score p-values are sorted in increasing order denoted by \(P_{ 1 },...,P_{n}\).</p>
+				<p>Next, for a particular desired FDR, \(\alpha\), we find the largest \(k\) such that \(P_{k} \le \frac{k}{m}\alpha\), where \(m\) is the number of unique interactions in the dataset.</p>
+				<!--  <p>\(P(k) = 1 - \frac{\sum_{i=1}^{i=x}P_{i}}{x}\) for \(x \in 1,2,...,n\).</p>-->
+				<p>From the My Data page, the click "False Discovery Rate" and choose your desired FDR threshold.</p>
+				<h2>Method Description</h2>
+					<p>Spotlite uses a two-layer logistic regression model to predict protein-protein interactions from APMS data. Details can be found in Spotlite's publication.</p>
+				<h2>Data Destruction</h2>
+					<p>Datasets are automatically deleted after 24 hrs or manually by the user on "My Data" page.</p>
+				<div align="left">
+				</div>
+			</div>
+		</div>
+	</g:HTMLPanel>
+
+</ui:UiBinder>

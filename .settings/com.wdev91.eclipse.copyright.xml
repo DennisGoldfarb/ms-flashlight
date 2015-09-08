@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project>
+	<owner></owner>
+	<copyright><![CDATA[Copyright 2012 The University of North Carolina at Chapel Hill.
+ All Rights Reserved.
+
+ Permission to use, copy, modify OR distribute this software and its
+ documentation for educational, research and non-profit purposes, without
+ fee, and without a written agreement is hereby granted, provided that the
+ above copyright notice and the following three paragraphs appear in all
+ copies.
+
+ IN NO EVENT SHALL THE UNIVERSITY OF NORTH CAROLINA AT CHAPEL HILL BE
+ LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+ CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE
+ USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE UNIVERSITY
+ OF NORTH CAROLINA HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+ DAMAGES.
+
+ THE UNIVERSITY OF NORTH CAROLINA SPECIFICALLY DISCLAIM ANY
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE
+ PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF
+ NORTH CAROLINA HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT,
+ UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+ The authors may be contacted via:
+
+ US Mail:           Dennis Goldfarb
+                    Wei Wang
+
+                    Department of Computer Science
+                      Sitterson Hall, CB #3175
+                      University of N. Carolina
+                      Chapel Hill, NC 27599-3175
+
+                    Ben Major
+
+                    Department of Cell Biology and Physiology 
+                      Lineberger Comprehensive Cancer Center
+                      University of N. Carolina
+                      Chapel Hill, NC 27599-3175
+
+ Email:             dennisg@cs.unc.edu
+                    weiwang@cs.unc.edu
+                    ben_major@med.unc.edu
+
+ Web:               www.unc.edu/~dennisg/]]></copyright>
+	<header contentId="org.eclipse.pde.fragmentManifest" excluded="true" />
+	<header contentId="org.eclipse.pde.pluginProperties" excluded="true" />
+	<header contentId="org.eclipse.pde.productFile" excluded="true" />
+	<header contentId="org.eclipse.jst.j2ee.appclientDD" excluded="true" />
+	<header contentId="org.eclipse.ant.core.antBuildFile" excluded="true" />
+	<header contentId="org.eclipse.pde.simpleCheatSheet" excluded="true" />
+	<header contentId="org.eclipse.core.runtime.xml" postBlankLines="0" lineFormat="false" preserveFirstLine="true">
+		<beginLine><![CDATA[<!--]]></beginLine>
+		<linePrefix><![CDATA[  ]]></linePrefix>
+		<endLine><![CDATA[-->]]></endLine>
+		<firstLinePattern><![CDATA[<\?xml version=.*\?>]]></firstLinePattern>
+	</header>
+	<header contentId="org.eclipse.jst.j2ee.webDD" excluded="true" />
+	<header contentId="org.eclipse.pde.compositeCheatSheet" excluded="true" />
+	<header contentId="org.eclipse.pde.schema" excluded="true" />
+	<header contentId="org.eclipse.pde.tocFile" excluded="true" />
+	<header contentId="org.eclipse.jst.j2ee.earDD" excluded="true" />
+	<header contentId="org.eclipse.pde.ctxHelpFile" excluded="true" />
+	<header contentId="org.eclipse.jdt.core.JARManifest" excluded="true" />
+	<header contentId="org.eclipse.pde.categoryManifest" excluded="true" />
+	<header contentId="org.eclipse.pde.buildProperties" excluded="true" />
+	<header contentId="org.eclipse.ui.views.log.log" excluded="true" />
+	<header contentId="org.eclipse.pde.siteManifest" excluded="true" />
+	<header contentId="org.eclipse.pde.bundleManifest" excluded="true" />
+	<header contentId="org.eclipse.pde.targetFile" excluded="true" />
+	<header contentId="org.eclipse.jst.j2ee.connectorDD" excluded="true" />
+	<header contentId="org.eclipse.pde.pluginManifest" excluded="true" />
+	<header contentId="org.eclipse.core.runtime.text" postBlankLines="0" lineFormat="true" preserveFirstLine="false">
+		<beginLine><![CDATA[#-------------------------------------------------------------------------------]]></beginLine>
+		<linePrefix><![CDATA[# ]]></linePrefix>
+		<endLine><![CDATA[#-------------------------------------------------------------------------------]]></endLine>
+	</header>
+	<header contentId="org.eclipse.jst.j2ee.ejbDD" excluded="true" />
+	<header contentId="org.eclipse.pde.featureManifest" excluded="true" />
+	<header contentId="org.eclipse.jdt.core.javaSource" postBlankLines="0" lineFormat="false" preserveFirstLine="false">
+		<beginLine><![CDATA[/*******************************************************************************]]></beginLine>
+		<linePrefix><![CDATA[ * ]]></linePrefix>
+		<endLine><![CDATA[ ******************************************************************************/]]></endLine>
+	</header>
+</project>
