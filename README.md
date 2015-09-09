@@ -25,15 +25,17 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 2. Make sure tomcat has permission to read/write to the output directory  
 3. Upload .war file located in dist/ to Tomcat.   
 ***
+
 # Getting Started - Developers
-##### Technologies and frameworks  
+#### Technologies and frameworks  
 * ***Google Web Toolkit (GWT)***  - This is the main framework used for the project. GWT allows us to build an entire web application in Java - leverging object oriented programming using a single language for both the front-end and back-end. The GWT compiler translates the front-end Java into javascript. Learn more here: http://www.gwtproject.org/
 * ***MySQL*** - The relational database used to store data. The data includes the precomputed features for all human gene-gene pairs necessary for classification of true/false interactions, protein sequences from UniProtKB and IPI, Gene information from NCBI, GO annotations, and ID mapping information.
 * ***Hibernate***  - This is a framework for Object Relational Mapping (ORM). ORM allows us to automatically convert the results of an SQL query into an object of the appropriate class. Typically, each table in the database has its own class. For example, the query "select * from proteins" will return a Collection<Protein>. All the programmer has to do is define the mapping of columns to fields in the Protein class. For general cases, this makes the programmers life easy, for some special purpose queries, this sometimes makes things difficult.
 * ***C3P0***  - The purpose of this framework is to manage database connections. Establishing a new connect is expensive in terms of time. Therefore C3P0 performs connection pooling and reuses old connections whenever possible. Using this approach, we typically don't have to create a new connection for each new visitor to the website. If an old one is free, it is reused. C3P0 takes care of it all behind the scenes.
 * ***Apache Tomcat***  - Since the back-end is a java servlet, we host the web application on an Apache Tomcat server. This program handles serving requests to our website, writes logs, etc.
 * ***Eclipse*** - Although it's not necessary to use Eclipse as your IDE, it's what I used throughout development. I'm pretty sure the build scripts do not depend on it. I've setup and deployed the entire project via command line. However, I think I do write a preferences file that's Eclipse specific to setup class-paths and files to ignore.
-##### Directory structure  
+
+#### Directory structure  
 
 **src/**  
 **----> edu.unc.flashlight.client/** application entry point, constants, messages, navigation history  
@@ -85,7 +87,7 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 * **Flashlight.gwt.xml** (located in src/edu.unc.flashlight/) Configuration for GWT. It's sometimes necessary to include information about third-party libraries used on the client side.
 * **ivy.xml** (located in root directory) Defines third-party libraries to be downloaded. This keeps us from having to store a bunch of big files in version control. Also allows us to get newer versions of the libraries.
 * **build.xml** (located in root directory) This is the ANT script with all the build targets. Use it to setup the project. It downloads third-party libraries, writes config files, compiles and deploys the project into a WAR file. The WAR is uploaded to Tomcat for deployment.
-##### Design patterns  
+#### Design patterns  
 * Individual webpages are designed using the Model-View-Presenter design pattern. Read more about using MVP with GWT here: http://www.gwtproject.org/articles/mvp-architecture.html
 * All communication between client and server is accomplished through Remote Procedure Calls (RPC). These are asynchronous, allowing the web application to remain responsive while waiting for results from the server. More information can be found here: http://www.gwtproject.org/doc/latest/tutorial/RPC.html
 and here: http://www.gwtproject.org/doc/latest/DevGuideServerCommunication.html
