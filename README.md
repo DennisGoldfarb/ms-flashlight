@@ -75,7 +75,7 @@ The purpose of the application is to get a file from the user and analyze it. Th
 **----> edu.unc.flashlight.shared/** code that both the server and client use. Mostly defines classes for data that needs to be passed between client and server.  
 **----------> exception/** exceptions...  
 **----------------> upload/** exceptions specific for the upload process  
-**----------> model/** classes for data transferred between client and server. Contains Hibernate mappings.   
+**----------> model/** classes for data transferred between client and server. Contains Hibernate mappings. Contains SQL/HQL queries 
 **----------------> details/** specifically for details of features used for classification  
 **----------------> SAINT/** specifically for SAINT parameters  
 **----------------> table/** specifically for information needed to display results in a table (# of total results, which page of the table we're displaying, etc)  
