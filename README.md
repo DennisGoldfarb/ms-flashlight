@@ -35,6 +35,19 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 * ***Apache Tomcat***  - Since the back-end is a java servlet, we host the web application on an Apache Tomcat server. This program handles serving requests to our website, writes logs, etc.
 * ***Eclipse*** - Although it's not necessary to use Eclipse as your IDE, it's what I used throughout development. I'm pretty sure the build scripts do not depend on it. I've setup and deployed the entire project via command line. However, I think I do write a preferences file that's Eclipse specific to setup class-paths and files to ignore.
 
+#### Basic workflow  
+The purpose of the application is to get a file from the user and analyze it. The process goes like this:
+1. A user selects a file and some parameters for analysis. (CLIENT SIDE)
+2. The file is uploaded to a temp directory on the server. (CLIENT/SERVER SIDE)
+3. The file is parsed. (SERVER SIDE)
+4. The identifiers of the file are mapped to Entrez Gene IDs. (SERVER SIDE)
+5. The APMS data is inserted into our database. (SERVER SIDE)
+6. The APMS data is scored via the selected APMS scoring algorithm. Permutations are done to calculate P-values. (SERVER SIDE)
+7. If the user requested the use of "indirect data" to help score their data, then those feature scores are retrieved from our database. (SERVER SIDE)
+8. The APMS data is further scored via a logistic regression model using the previously retrieved indirect data. (SERVER SIDE)
+9. The results are written to the database. (SERVER SIDE)
+10. The results are returned to the user. (CLIENT/SERVER SIDE)
+
 #### Directory structure  
 
 **schema/** Contains SQL files to create tables, drop tables, and insert data into MySQL  
