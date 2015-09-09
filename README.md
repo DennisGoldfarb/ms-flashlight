@@ -34,6 +34,7 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 * ***Apache Tomcat***  - Since the back-end is a java servlet, we host the web application on an Apache Tomcat server. This program handles serving requests to our website, writes logs, etc.
 * ***Eclipse*** - Although it's not necessary to use Eclipse as your IDE, it's what I used throughout development. I'm pretty sure the build scripts do not depend on it. I've setup and deployed the entire project via command line. However, I think I do write a preferences file that's Eclipse specific to setup class-paths and files to ignore.
 ##### Directory structure  
+
 **src/**  
 **----> edu.unc.flashlight.client/** application entry point, constants, messages, navigation history  
 **----------> command/** extended wrappers for RPC calls  
