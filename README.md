@@ -37,6 +37,10 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 
 #### Directory structure  
 
+**schema/** Contains SQL files to create, drop, and insert data into MySQL  
+**war/** Contains resources necessary for deployment: images, javascript, CSS, HTML, and web.xml  
+**lib-local/**  Contains some third-party libraries that are not available through online repositories. The rest are downloaded when executing the ANT build script.
+
 **src/**  
 **----> edu.unc.flashlight.client/** application entry point, constants, messages, navigation history  
 **----------> command/** extended wrappers for RPC calls  
@@ -76,10 +80,8 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 **----------> util/**  
 **----------------> schedule/** Anything on a timer. Handles deleting data after 24 hours.  
 
-**schema/** Contains SQL files to create, drop, and insert data into MySQL  
-**war/** Contains resources necessary for deployment: images, javascript, CSS, HTML, and web.xml  
-**lib-local/**  Contains some third-party libraries that are not available through online repositories. The rest are downloaded when executing the ANT build script.
 ##### Configuration files  
+
 * **web.xml** (located in war/WEB-INF/) Defines servlets. Every RPC goes through a servlet and each servlet needs a URL and a mapping to a class.
 * **log4j.properties** (located in src/) properties for logging. Verbose? Errors only? Warnings?
 * **build.properties** (located in root directory, after executing build.xml ANT script) Contains DB usernames, passwords, directory location for temporary uploaded data.
@@ -87,7 +89,9 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 * **Flashlight.gwt.xml** (located in src/edu.unc.flashlight/) Configuration for GWT. It's sometimes necessary to include information about third-party libraries used on the client side.
 * **ivy.xml** (located in root directory) Defines third-party libraries to be downloaded. This keeps us from having to store a bunch of big files in version control. Also allows us to get newer versions of the libraries.
 * **build.xml** (located in root directory) This is the ANT script with all the build targets. Use it to setup the project. It downloads third-party libraries, writes config files, compiles and deploys the project into a WAR file. The WAR is uploaded to Tomcat for deployment.
-#### Design patterns  
+
+#### Design patterns 
+
 * Individual webpages are designed using the Model-View-Presenter design pattern. Read more about using MVP with GWT here: http://www.gwtproject.org/articles/mvp-architecture.html
 * All communication between client and server is accomplished through Remote Procedure Calls (RPC). These are asynchronous, allowing the web application to remain responsive while waiting for results from the server. More information can be found here: http://www.gwtproject.org/doc/latest/tutorial/RPC.html
 and here: http://www.gwtproject.org/doc/latest/DevGuideServerCommunication.html
