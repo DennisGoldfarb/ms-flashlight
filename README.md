@@ -80,7 +80,7 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 **----------> util/**  
 **----------------> schedule/** Anything on a timer. Handles deleting data after 24 hours.  
 
-##### Configuration files  
+#### Configuration files  
 
 * **web.xml** (located in war/WEB-INF/) Defines servlets. Every RPC goes through a servlet and each servlet needs a URL and a mapping to a class.
 * **log4j.properties** (located in src/) properties for logging. Verbose? Errors only? Warnings?
