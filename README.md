@@ -59,7 +59,7 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 **----------------------> js/** widgets that needed to be used via javascript because no GWT wrapper existed for them.  
 **----------------------> popup/** popup widgets  
 
-**----> edu.unc.flashlight.shared/** code that both the server and client use  
+**----> edu.unc.flashlight.shared/** code that both the server and client use. Mostly defines classes for data that needs to be passed between client and server.  
 **----------> exception/** exceptions...  
 **----------------> upload/** exceptions specific for the upload process  
 **----------> model/** classes for data transferred between client and server. Contains Hibernate mappings.   
