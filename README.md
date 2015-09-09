@@ -37,16 +37,16 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 
 #### Basic workflow  
 The purpose of the application is to get a file from the user and analyze it. The process goes like this:  
-1. A user selects a file and some parameters for analysis. (CLIENT SIDE)  
-2. The file is uploaded to a temp directory on the server. (CLIENT/SERVER SIDE)  
-3. The file is parsed. (SERVER SIDE)  
-4. The identifiers of the file are mapped to Entrez Gene IDs. (SERVER SIDE)  
-5. The APMS data is inserted into our database. (SERVER SIDE)  
-6. The APMS data is scored via the selected APMS scoring algorithm. Permutations are done to calculate P-values. (SERVER SIDE)  
-7. If the user requested the use of "indirect data" to help score their data, then those feature scores are retrieved from our database. (SERVER SIDE)  
-8. The APMS data is further scored via a logistic regression model using the previously retrieved indirect data. (SERVER SIDE)
-9. The results are written to the database. (SERVER SIDE)  
-10. The results are returned to the user. (CLIENT/SERVER SIDE)  
+1. A user selects a file and some parameters for analysis. (client side)  
+2. The file is uploaded to a temp directory on the server. (client/server side)  
+3. The file is parsed. (server side)  
+4. The identifiers of the file are mapped to Entrez Gene IDs. (server side)  
+5. The APMS data is inserted into our database. (server side)  
+6. The APMS data is scored via the selected APMS scoring algorithm. Permutations are done to calculate P-values. (server side)  
+7. If the user requested the use of "indirect data" to help score their data, then those feature scores are retrieved from our database. (server side)  
+8. The APMS data is further scored via a logistic regression model using the previously retrieved indirect data. (server side)
+9. The results are written to the database. (server side)  
+10. The results are returned to the user. (client/server side)  
 
 #### Directory structure  
 
