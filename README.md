@@ -42,7 +42,7 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 **lib-local/**  Contains some third-party libraries that are not available through online repositories. The rest are downloaded when executing the ANT build script.
 
 **src/**  
-**----> edu.unc.flashlight.client/** application entry point, constants, messages, navigation history  
+**----> edu.unc.flashlight.client/** All client side code. Application entry point, constants, messages, navigation history  
 **----------> command/** extended wrappers for RPC calls  
 **----------> resource/** manages image and js resources   
 **----------------> css/** manages css resources  
