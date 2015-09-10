@@ -50,6 +50,7 @@ The purpose of the application is to get a file from the user and analyze it. Th
 
 #### Directory structure  
 
+**data/** Contains the TIP49 dataset as an example file to upload  
 **schema/** Contains SQL files to create tables, drop tables, and insert data into MySQL  
 **war/** Contains resources necessary for deployment: images, javascript, CSS, HTML, and web.xml  
 **lib-local/**  Contains some third-party libraries that are not available through online repositories. The rest are downloaded when executing the ANT build script.
