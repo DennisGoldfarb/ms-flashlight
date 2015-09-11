@@ -109,3 +109,39 @@ The purpose of the application is to get a file from the user and analyze it. Th
 * Individual webpages are designed using the Model-View-Presenter design pattern. Read more about using MVP with GWT here: http://www.gwtproject.org/articles/mvp-architecture.html
 * All communication between client and server is accomplished through Remote Procedure Calls (RPC). These are asynchronous, allowing the web application to remain responsive while waiting for results from the server. More information can be found here: http://www.gwtproject.org/doc/latest/tutorial/RPC.html
 and here: http://www.gwtproject.org/doc/latest/DevGuideServerCommunication.html
+
+#### Adding a new web page  
+
+* Create a new Place class for your new page in src/edu/unc/flashlight/client/ui/place/
+* Create a new Activity class for your new page in src/edu/unc/flashlight/client/ui/activity/
+* Create a new View interface in src/edu/unc/flashlight/client/ui/view/
+* Create a new ViewImpl class (defines the functions behind the UI) in src/edu/unc/flashlight/client/ui/view/impl
+* Create a new .ui.xml file to describe the UI (pretty much html) in src/edu/unc/flashlight/client/ui/view/impl
+* Add any necessary text to the FlashlightConstants interface in src/edu/unc/flashlight/client/
+* Add your new Place and Activity to the getActivity function in AppActivityMapper in src/edu/unc/flashlight/client/
+* Add your Place's Tokenizer to the AppPlaceHistoryMapper class in src/edu/unc/flashlight/client/
+* Add your Place to the PlaceFactory class in src/edu/unc/flashlight/client/
+* Add a new menu link to the FlashlightMenu class in src/edu/unc/flashlight/client/ui/
+* Add your View to the ClientFactory interface in src/edu/unc/flashlight/client/
+* Add your View to the ClientFactoryImpl class in src/edu/unc/flashlight/client/
+
+#### Creating a new function call between client and server
+
+* Add your function to the appropriate Service and AsyncService interfaces found in src/edu/unc/flashlight/client/service/
+* Implement your function to the appropriate ServletImpl class found in /src/edu/unc/flashlight/server/
+
+#### Creating a new servlet
+
+* Create a new ServletImpl class in /src/edu/unc/flashlight/server/
+* Create an AsyncService interface in src/edu/unc/flashlight/client/service/
+* Create a Service interface in src/edu/unc/flashlight/client/service/
+* Add the AsyncService to the Flashlight class
+* Add your Servlet information to web.xml in war/WEB-INF/
+
+#### Changing the database schema
+
+* Modify the sql files found in schema/
+* Modify/Add a Model class that describes your table in src/edu/unc/flashlight/shared/model/
+* Add modify and queries in the Model class
+* Modify/Add the corresponding DAO class in src/edu/unc/flashlight/server/dao/
+* If a new class/model, add it to hibernate.cfg.in.xml in the root directory
