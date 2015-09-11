@@ -128,7 +128,7 @@ and here: http://www.gwtproject.org/doc/latest/DevGuideServerCommunication.html
 #### Creating a new function call between client and server
 
 * Add your function to the appropriate Service and AsyncService interfaces found in src/edu/unc/flashlight/client/service/
-* Implement your function to the appropriate ServletImpl class found in /src/edu/unc/flashlight/server/
+* Implement your function in the appropriate ServletImpl class found in /src/edu/unc/flashlight/server/
 
 #### Creating a new servlet
 
