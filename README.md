@@ -28,6 +28,8 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 
 # Getting Started - Developers
 
+Begin by follwowing installation procedures to setup the project in Elipse. Use the figure below and the directory structure breakdown below to familiarize yourself with how the code is organized. Information on the necessary steps to achieve common development tasks are at the end.  
+
 ![Image of folder structure] (https://github.com/DennisGoldfarb/ms-flashlight/blob/master/GettingStarted.png)
 
 #### Technologies and frameworks  
