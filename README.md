@@ -27,6 +27,9 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 ***
 
 # Getting Started - Developers
+
+![Image of folder structure] (https://github.com/DennisGoldfarb/ms-flashlight/GettingStarted.png)
+
 #### Technologies and frameworks  
 * ***Google Web Toolkit (GWT)***  - This is the main framework used for the project. GWT allows us to build an entire web application in Java - leverging object oriented programming using a single language for both the front-end and back-end. The GWT compiler translates the front-end Java into javascript. Definitely devour the information found in http://www.gwtproject.org/ if you've never used GWT before. 
 * ***MySQL*** - The relational database used to store data. The data includes the precomputed features for all human gene-gene pairs necessary for classification of true/false interactions, protein sequences from UniProtKB and IPI, Gene information from NCBI, GO annotations, and ID mapping information.
