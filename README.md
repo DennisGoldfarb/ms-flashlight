@@ -16,7 +16,7 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 2. Make sure Tomcat has permission to execute SAINT-express  
 	  
 **Setup Development Environment**  
-1. Checkout spotlite project in Eclipse
+1. Checkout spotlite project in Eclipse  
 2. Run ant using build.xml target "eclipse-mysql" to create config files and download third-party libraries  
 3. Fill it out build.properties with your specific parameters   
 	
