@@ -70,10 +70,10 @@ The purpose of the application is to get a file from the user and analyze it. Th
 **ui/** Contains menu class  
 **ui/activity/** Implementation of "presenters"  
 **ui/event/** Events that should trigger a response (e.g. file upload complete)  
-**ui/place/** Definitions of "web pages"  
+**ui/place/** Definitions of "web pages" for purposes of navigation history  
 **ui/validation/** validation messages  
 **ui/view/** Interfaces for a web page  
-**ui/view/impl/**  Actual web pages  
+**ui/view/impl/**  Actual web pages, HTML-like code  
 **ui/widget/** Customized, reusable widgets  
 **ui/widget/details/** widgets for details of features used in classification  
 **ui/widget/js/** widgets that needed to be used via javascript because no GWT wrapper existed for them.  
