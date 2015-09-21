@@ -61,6 +61,7 @@ The purpose of the application is to get a file from the user and analyze it. Th
 **lib-local/**  Contains some third-party libraries that are not available through online repositories. The rest are downloaded when executing the ANT build script.
 
 **src/**  
+######Client
 **----> edu.unc.flashlight.client/** All client side code. Application entry point, constants, messages, navigation history  
 **----------> command/** extended wrappers for RPC calls  
 **----------> resource/** manages image and js resources   
@@ -78,6 +79,7 @@ The purpose of the application is to get a file from the user and analyze it. Th
 **----------------------> js/** widgets that needed to be used via javascript because no GWT wrapper existed for them.  
 **----------------------> popup/** popup widgets  
 
+######Shared
 **----> edu.unc.flashlight.shared/** code that both the server and client use. Mostly defines classes for data that needs to be passed between client and server.  
 **----------> exception/** exceptions...  
 **----------------> upload/** exceptions specific for the upload process  
@@ -89,6 +91,7 @@ The purpose of the application is to get a file from the user and analyze it. Th
 **----------> util/** Converters, constants, random support  
 **----------> validation/** Input validation classes (e.g. constraints defined by the database schema)  
 
+######Server
 **----> edu.unc.flashlight.server/** Servlets that handle all RPC communication  
 **----------> dao/** Data Access Objects. Gets results from SQL queries, defines SQL queries that don't fit into a particular class.  
 **----------> graph/** Graph theory stuff  
