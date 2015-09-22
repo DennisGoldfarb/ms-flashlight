@@ -28,6 +28,8 @@ Spotlite is a web application for predicting co-complexed proteins from affinity
 
 # Getting Started - Developers
 
+Begin by following installation procedures to setup the project in Eclipse. Use the figure below and the directory structure breakdown further down to familiarize yourself with how the code is organized. Information on the necessary steps to achieve common development tasks are found at the end.  
+
 ![Image of folder structure] (https://github.com/DennisGoldfarb/ms-flashlight/blob/master/GettingStarted.png)
 
 #### Technologies and frameworks  
@@ -59,43 +61,46 @@ The purpose of the application is to get a file from the user and analyze it. Th
 **lib-local/**  Contains some third-party libraries that are not available through online repositories. The rest are downloaded when executing the ANT build script.
 
 **src/**  
-**----> edu.unc.flashlight.client/** All client side code. Application entry point, constants, messages, navigation history  
-**----------> command/** extended wrappers for RPC calls  
-**----------> resource/** manages image and js resources   
-**----------------> css/** manages css resources  
-**----------> service/** interfaces for communication with the server   
-**----------> ui/** Contains menu class  
-**----------------> activity/** Implementation of "presenters"  
-**----------------> event/** Events that should trigger a response (e.g. file upload complete)  
-**----------------> place/** Definitions of "web pages"  
-**----------------> validation/** validation messages  
-**----------------> view/** Interfaces for a web page  
-**----------------------> impl/**  Actual web pages  
-**----------------> widget/** Customized, reusable widgets  
-**----------------------> details/** widgets for details of features used in classification  
-**----------------------> js/** widgets that needed to be used via javascript because no GWT wrapper existed for them.  
-**----------------------> popup/** popup widgets  
+######Client  
+**edu.unc.flashlight.client/** All client side code. Application entry point, constants, messages, navigation history  
+**command/** extended wrappers for RPC calls  
+**resource/** manages image and js resources   
+**resource/css/** manages css resources  
+**service/** interfaces for communication with the server   
+**ui/** Contains menu class  
+**ui/activity/** Implementation of "presenters"  
+**ui/event/** Events that should trigger a response (e.g. file upload complete)  
+**ui/place/** Definitions of "web pages" for purposes of navigation history  
+**ui/validation/** validation messages  
+**ui/view/** Interfaces for a web page  
+**ui/view/impl/**  Actual web pages, HTML-like code  
+**ui/widget/** Customized, reusable widgets  
+**ui/widget/details/** widgets for details of features used in classification  
+**ui/widget/js/** widgets that needed to be used via javascript because no GWT wrapper existed for them.  
+**ui/widget/popup/** popup widgets  
 
-**----> edu.unc.flashlight.shared/** code that both the server and client use. Mostly defines classes for data that needs to be passed between client and server.  
-**----------> exception/** exceptions...  
-**----------------> upload/** exceptions specific for the upload process  
-**----------> model/** classes for data transferred between client and server. Contains Hibernate mappings. Contains SQL/HQL queries  
-**----------------> details/** specifically for details of features used for classification  
-**----------------> SAINT/** specifically for SAINT parameters  
-**----------------> table/** specifically for information needed to display results in a table (# of total results, which page of the table we're displaying, etc)  
-**----------------> upload/** specifically for data related to the upload process  
-**----------> util/** Converters, constants, random support  
-**----------> validation/** Input validation classes (e.g. constraints defined by the database schema)  
+######Shared  
+**edu.unc.flashlight.shared/** code that both the server and client use. Mostly defines classes for data that needs to be passed between client and server.  
+**exception/** exceptions...  
+**exception/upload/** exceptions specific for the upload process  
+**model/** classes for data transferred between client and server. Contains Hibernate mappings. Contains SQL/HQL queries  
+**model/details/** specifically for details of features used for classification  
+**model/details/SAINT/** specifically for SAINT parameters  
+**model/details/table/** specifically for information needed to display results in a table (# of total results, which page of the table we're displaying, etc)  
+**model/details/upload/** specifically for data related to the upload process  
+**util/** Converters, constants, random support  
+**validation/** Input validation classes (e.g. constraints defined by the database schema)  
 
-**----> edu.unc.flashlight.server/** Servlets that handle all RPC communication  
-**----------> dao/** Data Access Objects. Gets results from SQL queries, defines SQL queries that don't fit into a particular class.  
-**----------> graph/** Graph theory stuff  
-**----------> hibernate/** Old hibernate mappings. Deprecated except for a couple cases. Hibernate.cfg.xml shows which classes are still linked to files here.   
-**----------> ms/** APMS scoring algorithms  
-**----------> parser/** Uploaded data parsers  
-**----------> rf/** Machine learning classes. Used to be Random Forest hence rf  
-**----------> util/**  
-**----------------> schedule/** Anything on a timer. Handles deleting data after 24 hours.  
+######Server  
+**edu.unc.flashlight.server/** Servlets that handle all RPC communication  
+**dao/** Data Access Objects. Gets results from SQL queries, defines SQL queries that don't fit into a particular class.  
+**graph/** Graph theory stuff  
+**hibernate/** Old hibernate mappings. Deprecated except for a couple cases. Hibernate.cfg.xml shows which classes are still linked to files here.   
+**ms/** APMS scoring algorithms  
+**parser/** Uploaded data parsers  
+**rf/** Machine learning classes. Used to be Random Forest hence rf  
+**util/**  
+**util/schedule/** Anything on a timer. Handles deleting data after 24 hours.  
 
 #### Configuration files  
 
