@@ -3,6 +3,21 @@ Automatically exported from code.google.com/p/ms-flashlight (mostly)
 
 Spotlite is a web application for predicting co-complexed proteins from affinity purification-mass spectrometry data. It was developed using Google Web Toolkit (GWT), MySQL, and Hibernate. It should be deployed on an Apache Tomcat server. Publication: http://pubs.acs.org/doi/abs/10.1021/pr5008416
 ***
+# Workflow
+![Image of workflow] (https://github.com/DennisGoldfarb/ms-flashlight/blob/master/Workflow.png)
+
+The purpose of the application is to get a file from the user and analyze it. The process goes like this:  
+1. A user selects a file and some parameters for analysis. (client side)  
+2. The file is uploaded to a temp directory on the server. (client/server side)  
+3. The file is parsed. (server side)  
+4. The identifiers of the file are mapped to Entrez Gene IDs. (server side)  
+5. The APMS data is inserted into our database. (server side)  
+6. The APMS data is scored via the selected APMS scoring algorithm. Permutations are done to calculate P-values. (server side)  
+7. If the user requested the use of "indirect data" to help score their data, then those feature scores are retrieved from our database. (server side)  
+8. The APMS data is further scored via a logistic regression model using the previously retrieved indirect data. (server side)
+9. The results are written to the database. (server side)  
+10. The results are returned to the user. (client/server side)  
+
 # Installation Procedures   
   
 **Setup MySQL**  
@@ -39,19 +54,6 @@ Begin by following installation procedures to setup the project in Eclipse. Use 
 * ***C3P0***  - The purpose of this framework is to manage database connections. Establishing a new connect is expensive in terms of time. Therefore C3P0 performs connection pooling and reuses old connections whenever possible. Using this approach, we typically don't have to create a new connection for each new visitor to the website. If an old one is free, it is reused. C3P0 takes care of it all behind the scenes.
 * ***Apache Tomcat***  - Since the back-end is a java servlet, we host the web application on an Apache Tomcat server. This program handles serving requests to our website, writes logs, etc.
 * ***Eclipse*** - Although it's not necessary to use Eclipse as your IDE, it's what I used throughout development. I'm pretty sure the build scripts do not depend on it. I've setup and deployed the entire project via command line. However, I think I do write a preferences file that's Eclipse specific to setup class-paths and files to ignore.
-
-#### Basic workflow  
-The purpose of the application is to get a file from the user and analyze it. The process goes like this:  
-1. A user selects a file and some parameters for analysis. (client side)  
-2. The file is uploaded to a temp directory on the server. (client/server side)  
-3. The file is parsed. (server side)  
-4. The identifiers of the file are mapped to Entrez Gene IDs. (server side)  
-5. The APMS data is inserted into our database. (server side)  
-6. The APMS data is scored via the selected APMS scoring algorithm. Permutations are done to calculate P-values. (server side)  
-7. If the user requested the use of "indirect data" to help score their data, then those feature scores are retrieved from our database. (server side)  
-8. The APMS data is further scored via a logistic regression model using the previously retrieved indirect data. (server side)
-9. The results are written to the database. (server side)  
-10. The results are returned to the user. (client/server side)  
 
 #### Directory structure  
 
