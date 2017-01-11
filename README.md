@@ -2,6 +2,8 @@
 Automatically exported from code.google.com/p/ms-flashlight (mostly)
 
 Spotlite is a web application for predicting co-complexed proteins from affinity purification-mass spectrometry data. It was developed using Google Web Toolkit (GWT), MySQL, and Hibernate. It should be deployed on an Apache Tomcat server. Publication: http://pubs.acs.org/doi/abs/10.1021/pr5008416
+
+During deployed at: https://lbgsites2.bioinf.unc.edu/spotlite
 ***
 # Workflow
 ![Image of workflow] (https://github.com/DennisGoldfarb/ms-flashlight/blob/master/Workflow.png)
